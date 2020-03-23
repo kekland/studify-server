@@ -34,6 +34,8 @@ export class Message extends BaseEntity {
   @UpdateDateColumn()
   updated!: Date;
 
+  groupId?: string;
+
   constructor(data?: IMessage) {
     super()
     if (data) {
@@ -59,6 +61,7 @@ export class Message extends BaseEntity {
   static transformSocket(data: Message) {
     return {
       id: data.id,
+      groupId: data.group?.id ?? data.groupId,
       body: data.body,
       attachments: data.attachments,
       user: User.transformMinimal(data.user),

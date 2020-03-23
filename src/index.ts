@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { configuration } from "./config"
 import { authRouter } from "./router/auth"
 import express, { Router } from 'express'

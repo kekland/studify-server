@@ -16,17 +16,23 @@ export class MessagingSocket {
         return
       }
 
-      user.groups.forEach(group => socket.join(group.id))
+      socket.join(user.groups.map(v => v.id))
       server.to(socket.id).emit('authorization', { success: true })
 
-      console.log('joined all groups')
       generateSocketEventHandler<SendMessageData, SendMessageResponse>('messageSend', socket, async (data) => {
+        console.log(data)
         const response = await MessagingMethods.sendMessage(user, data)
 
-        server.to(data.groupId).emit('messageSend', SendMessageResponse.transform(response))
+        console.log(data.groupId, 'alih umer!!!')
+        socket.broadcast.to(data.groupId).emit('newGroupMessage', SendMessageResponse.transform(response))
+
+        if (data.idempotencyId) {
+          console.log(socket.rooms, socket.id, data.idempotencyId)
+          server.to(socket.id).emit('messageSent', SendMessageResponse.transform(response, data.idempotencyId))
+        }
 
         return response
-      }, { inputClass: SendMessageData })
+      }, { inputClass: SendMessageData, validateBody: true })
 
       socket.on('joinRoom', async (room: string) => {
         try {

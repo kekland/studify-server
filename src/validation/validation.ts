@@ -9,6 +9,7 @@ import { validate } from 'class-validator'
 import { ClassType } from "class-transformer/ClassTransformer";
 import { UserMethods } from "../methods/user/user";
 import { Socket } from "socket.io";
+import { SendMessageData } from "../methods/messaging/_data";
 
 export interface IValidationSettings<T> {
   permission?: PermissionLevel,
@@ -108,8 +109,8 @@ export const validateSocketRequest = async <T>(socket: Socket, body: any, settin
 
     let data: T = (body as T)
     // Transform the body
-    if (inputClass) {
-      data = plainToClass(inputClass, body)
+    if (validateBody) {
+      data = plainToClass(inputClass as ClassType<T>, data)
     }
 
     // Validate the body

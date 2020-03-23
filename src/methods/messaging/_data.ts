@@ -14,6 +14,10 @@ export class SendMessageData {
   @IsArray()
   @IsUrl({}, { each: true })
   attachments?: string[];
+
+  @IsOptional()
+  @IsString()
+  idempotencyId?: string;
 }
 
 export class SendMessageResponse {
@@ -23,9 +27,10 @@ export class SendMessageResponse {
     this.message = message
   }
 
-  static transform(data: SendMessageResponse) {
+  static transform(data: SendMessageResponse, idempotencyId?: string) {
     return {
-      message: Message.transformSocket(data.message)
+      message: Message.transformSocket(data.message),
+      idempotencyId: idempotencyId,
     }
   }
 }

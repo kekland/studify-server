@@ -6,6 +6,7 @@ import { GroupMethods } from '../methods/group/group'
 import { GroupAdminMethods } from '../methods/group/group_admin'
 import { GetMessagesData, GetMessagesResponse } from '../methods/messaging/_data'
 import { MessagingMethods } from '../methods/messaging/messaging'
+import { ClassType } from "class-transformer/ClassTransformer";
 
 const getGroup = generateUnauthorizedMethodEndpoint<GroupGetData, GroupGetResponse>(GroupMethods.getGroup, {
   inputClass: GroupGetData,
@@ -34,11 +35,11 @@ const getMessages = generateAuthorizedMethodEndpoint<GetMessagesData, GetMessage
 export const groupRouter: () => Router = () => {
   const router = Router()
 
-  router.get('/', getGroup)
-  router.get('/all', getAllGroups)
-  router.get('/messages', getMessages)
-  router.post('/', createGroup)
-  router.put('/', updateGroup)
+  router.post('/id', getGroup)
+  router.post('/all', getAllGroups)
+  router.post('/messages', getMessages)
+  router.post('/create', createGroup)
+  router.post('/update', updateGroup)
 
   return router
 }

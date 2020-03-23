@@ -50,7 +50,6 @@ export class Group extends BaseEntity {
       name: data.name,
       description: data.description,
       colorId: data.colorId,
-      users: data.users ? data.users.map(User.transformMinimal) : undefined,
       creator: User.transformMinimal(data.creator),
       created: data.created,
       updated: data.updated,

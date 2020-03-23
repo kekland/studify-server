@@ -10,20 +10,22 @@ export const generateSocketEventHandler = <Req, Res>
     task: (data: Req) => Promise<Res>,
     validation: IValidationSettings<Req>) => {
   socket.on(event, async (body) => {
-    console.log(event, body)
-
     try {
-      const { user, data } = await validateSocketRequest(socket, body, {
+      let contents = (typeof body === 'object')? body : JSON.parse(body)
+      const { user, data } = await validateSocketRequest(socket, contents, {
         inputClass: validation.inputClass,
         validateBody: validation.validateBody,
-        populateUser: false,
-        validateUser: false,
+        populateUser: true,
+        validateUser: true,
       })
+
+      console.log('AAABAA')
+
       await task(data)
     }
     catch (e) {
       let errorBody = e
-      if (errorBody == {}) errorBody = Errors.internalServerError
+      if (!errorBody) errorBody = Errors.internalServerError
       socket.to(socket.id).error(errorBody)
     }
   })

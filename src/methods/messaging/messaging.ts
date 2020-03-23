@@ -8,9 +8,11 @@ export class MessagingMethods {
   static sendMessage: AuthorizedMethod<SendMessageData, SendMessageResponse> = async (user, data) => {
     const group = await GroupMethods.getGroupById(data.groupId)
 
+    console.log(1)
     if (!group) throw Errors.invalidRequest
     if (!user.hasGroup(group)) throw Errors.insufficientPermissions
 
+    console.log(2)
     const message = new Message({
       body: data.body,
       attachments: data.attachments,
@@ -20,6 +22,7 @@ export class MessagingMethods {
 
     await message.save()
 
+    console.log(message)
     return new SendMessageResponse(message)
   }
 
@@ -36,7 +39,7 @@ export class MessagingMethods {
       .orderBy('message.created', 'DESC')
       .getMany()
 
-    console.log(messages)
+    messages.forEach(message => message.groupId = group.id)
     return new GetMessagesResponse(messages)
   }
 }
