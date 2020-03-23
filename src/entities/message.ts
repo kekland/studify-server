@@ -1,10 +1,10 @@
 import { User } from "./user";
 import { Group } from "./group";
-import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn, BaseEntity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn, BaseEntity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne } from "typeorm";
 
 export interface IMessage {
   body: string;
-  attachments: string[];
+  attachments?: string[];
   user: User;
   group: Group;
 }
@@ -17,14 +17,14 @@ export class Message extends BaseEntity {
   @Column()
   body!: string;
 
-  @Column('varchar', { array: true })
-  attachments!: string[];
+  @Column('varchar', { array: true, nullable: true })
+  attachments?: string[];
 
-  @OneToOne(type => User)
+  @ManyToOne(type => User, { eager: true })
   @JoinColumn()
   user!: User;
 
-  @OneToOne(type => Group)
+  @ManyToOne(type => Group)
   @JoinColumn()
   group!: Group;
 

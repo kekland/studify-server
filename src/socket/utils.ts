@@ -6,11 +6,12 @@ import { classToPlain } from 'class-transformer'
 import { Errors } from '../validation/errors'
 
 export const generateSocketEventHandler = <Req, Res>
-  (event: string, message: string, socket: Socket,
+  (event: string, socket: Socket,
     task: (data: Req) => Promise<Res>,
-    validation: IValidationSettings<Req>,
-    transformer: Transformer<Res> = defaultTransformer) => {
-  return socket.on(event, async (body) => {
+    validation: IValidationSettings<Req>) => {
+  socket.on(event, async (body) => {
+    console.log(event, body)
+
     try {
       const { user, data } = await validateSocketRequest(socket, body, {
         inputClass: validation.inputClass,
@@ -18,13 +19,7 @@ export const generateSocketEventHandler = <Req, Res>
         populateUser: false,
         validateUser: false,
       })
-      const responseBody = await task(data)
-      if (responseBody) {
-        socket.to(socket.id).emit(message, classToPlain(transformer(responseBody as NonNullable<Res>)))
-      }
-      else {
-        socket.to(socket.id).emit(message, {})
-      }
+      await task(data)
     }
     catch (e) {
       let errorBody = e

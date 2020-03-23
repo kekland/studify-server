@@ -1,15 +1,19 @@
-import { IsNotEmpty, Max, IsNumber } from "class-validator";
+import { IsNotEmpty, Max, IsNumber, IsArray, IsString, IsUrl, ValidateIf, IsOptional } from "class-validator";
 import { Message } from "../../entities/message";
 
 export class SendMessageData {
   @IsNotEmpty()
+  @IsString()
   groupId!: string;
 
   @IsNotEmpty()
+  @IsString()
   body!: string;
 
-  @IsNotEmpty()
-  attachments!: string[];
+  @IsOptional()
+  @IsArray()
+  @IsUrl({}, { each: true })
+  attachments?: string[];
 }
 
 export class SendMessageResponse {

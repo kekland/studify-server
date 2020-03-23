@@ -28,6 +28,7 @@ const updateGroup = generateAuthorizedMethodEndpoint<GroupUpdateData, Group>(Gro
 
 const getMessages = generateAuthorizedMethodEndpoint<GetMessagesData, GetMessagesResponse>(MessagingMethods.getMessages, {
   inputClass: GetMessagesData,
+  populateUser: true
 }, GetMessagesResponse.transform)
 
 export const groupRouter: () => Router = () => {

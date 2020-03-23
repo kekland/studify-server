@@ -32,9 +32,11 @@ export class MessagingMethods {
     const messages = await Message.createQueryBuilder('message').where('message.group = :groupId', { groupId: group.id })
       .limit(data.limit)
       .skip(data.skip)
-      .orderBy('created', 'DESC')
+      .leftJoinAndSelect('message.user', 'user')
+      .orderBy('message.created', 'DESC')
       .getMany()
 
+    console.log(messages)
     return new GetMessagesResponse(messages)
   }
 }

@@ -10,26 +10,34 @@ export class MessagingSocket {
   static async initialize(server: Server) {
     server.on('connection', async (socket) => {
       const user = await checkSocketAuthentication(socket)
+      console.log(user)
       if (!user) {
         socket.disconnect()
         return
       }
 
       user.groups.forEach(group => socket.join(group.id))
+      server.to(socket.id).emit('authorization', { success: true })
 
-      generateSocketEventHandler<SendMessageData, SendMessageResponse>('message', 'messageSent', socket, async (data) => {
+      console.log('joined all groups')
+      generateSocketEventHandler<SendMessageData, SendMessageResponse>('messageSend', socket, async (data) => {
         const response = await MessagingMethods.sendMessage(user, data)
 
-        socket.to(data.groupId).send(SendMessageResponse.transform(response))
+        server.to(data.groupId).emit('messageSend', SendMessageResponse.transform(response))
 
         return response
-      }, { inputClass: SendMessageData }, SendMessageResponse.transform)
+      }, { inputClass: SendMessageData })
 
       socket.on('joinRoom', async (room: string) => {
-        const group = await GroupMethods.getGroupById(room)
+        try {
+          const group = await GroupMethods.getGroupById(room)
 
-        if (!group) socket.error(Errors.invalidRequest)
-        else socket.join(group.id)
+          if (!group) socket.to(socket.id).error(Errors.invalidRequest)
+          else socket.join(group.id)
+        }
+        catch (e) {
+          socket.to(socket.id).error(e)
+        }
       })
 
       socket.on('leaveRoom', async (room: string) => {

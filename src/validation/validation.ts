@@ -24,7 +24,7 @@ export const validateRequest = async <T>(req: Request, settings: IValidationSett
   const permissionLevel = settings.permission ?? 1
   const validateUser = settings.validateUser ?? true
   const validateBody = settings.validateBody ?? true
-  const populateUser = settings.populateUser ?? false
+  const populateUser = settings.populateUser ?? true
   const additionalPermissionChecks = settings.additionalPermissionChecks
   const inputClass = settings.inputClass
 
@@ -82,7 +82,7 @@ export const validateSocketRequest = async <T>(socket: Socket, body: any, settin
   const permissionLevel = settings.permission ?? 1
   const validateUser = settings.validateUser ?? true
   const validateBody = settings.validateBody ?? true
-  const populateUser = settings.populateUser ?? false
+  const populateUser = settings.populateUser ?? true
   const additionalPermissionChecks = settings.additionalPermissionChecks
   const inputClass = settings.inputClass
 
