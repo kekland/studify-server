@@ -26,6 +26,7 @@ export class GroupAdminMethods {
     const group = await GroupMethods.getGroupById(data.id)
 
     if (!group) throw Errors.invalidRequest
+    if (group.creator.id !== user.id) throw Errors.insufficientPermissions
 
     group.name = data.name
     group.description = data.description

@@ -14,7 +14,7 @@ export interface IValidationSettings<T> {
   validateUser?: boolean,
   validateBody?: boolean,
   populateUser?: boolean,
-  additionalPermissionChecks?: (user: User | undefined, data: T) => Promise<boolean>,
+  additionalPermissionChecks?: (user: User, data: T) => Promise<boolean>,
   inputClass: ClassType<T>,
 }
 
@@ -58,8 +58,8 @@ export const validateRequest = async <T>(req: Request, settings: IValidationSett
     }
 
     // If additional checks are provided, check against them
-    if (additionalPermissionChecks) {
-      const errored = await additionalPermissionChecks(user, data)
+    if (validateUser && additionalPermissionChecks) {
+      const errored = await additionalPermissionChecks(user as User, data)
       if (errored) throw Errors.insufficientPermissions
     }
 
