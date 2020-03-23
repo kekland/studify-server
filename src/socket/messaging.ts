@@ -7,10 +7,8 @@ import { MessagingMethods } from '../methods/messaging/messaging'
 import { Errors } from '../validation/errors'
 
 export class MessagingSocket {
-  static server: Server
-
-  static async initialize() {
-    this.server.on('connection', async (socket) => {
+  static async initialize(server: Server) {
+    server.on('connection', async (socket) => {
       const user = await checkSocketAuthentication(socket)
       if (!user) {
         socket.disconnect()

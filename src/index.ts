@@ -5,25 +5,26 @@ import bodyParser from 'body-parser'
 import { createConnection } from 'typeorm'
 import { groupRouter } from "./router/group"
 import socketio from 'socket.io'
+import { MessagingSocket } from "./socket/messaging"
 
 const bootstrap = async () => {
   // Load configuration
   const { port, socketPort, options } = configuration
 
   // Load Express
-  const app = express()
-  app.use(bodyParser())
-  app.use((req, res, next) => {
+  const expressServer = express()
+  expressServer.use(bodyParser())
+  expressServer.use((req, res, next) => {
     console.log({ ip: req.ip, body: req.body, url: req.url })
     next()
   })
 
   // Load Socket.io
-  const io = socketio()
+  const socketServer = socketio()
+  MessagingSocket.initialize(socketServer)
 
   // Connect to mongo
-  const connection = await createConnection(options)
-  // await connection.connect()
+  await createConnection(options)
 
   // Setup routers
   const routers: { [key: string]: Router } = {
@@ -31,11 +32,11 @@ const bootstrap = async () => {
     '/group': groupRouter(),
   }
 
-  Object.keys(routers).forEach(key => app.use(key, routers[key]))
+  Object.keys(routers).forEach(key => expressServer.use(key, routers[key]))
 
   // Start server on port
-  app.listen(port)
-  io.listen(socketPort)
+  expressServer.listen(port)
+  socketServer.listen(socketPort)
 }
 
 bootstrap()
