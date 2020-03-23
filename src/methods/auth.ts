@@ -4,9 +4,8 @@ import { compare, hash, genSaltSync } from 'bcrypt'
 import { sign } from 'jsonwebtoken'
 import { Errors } from "../validation/errors";
 import { configuration } from "../config";
-import { User } from "../classes/user";
+import { User } from "../entities/user";
 import { PermissionLevels } from "../validation/permissions";
-import { RepositoryManager } from "../database/database";
 import { UnauthorizedMethod } from "./utils";
 
 export class SignInData {
@@ -24,6 +23,7 @@ export class SignInData {
 
 export interface SignInResponse {
   token: string;
+  user: User;
 }
 
 export class SignUpData {
@@ -46,7 +46,7 @@ export interface SignUpResponse {
 }
 
 export const signIn: UnauthorizedMethod<SignInData, SignInResponse> = async (credentials) => {
-  const user = await UserMethods.findUser({ username: credentials.username })
+  const user = await UserMethods.findUser({ username: credentials.username }, true)
 
   if (!user) throw Errors.invalidCredentials
 
@@ -54,7 +54,7 @@ export const signIn: UnauthorizedMethod<SignInData, SignInResponse> = async (cre
 
   if (matches) {
     const token = sign({ id: user.id }, configuration.jwt)
-    return { token }
+    return { token, user }
   }
   else {
     throw Errors.invalidCredentials
@@ -73,12 +73,11 @@ export const signUp: UnauthorizedMethod<SignUpData, SignUpResponse> = async (dat
     username: data.username,
     name: data.name,
     hash: passwordHash,
-    friends: [],
     groups: [],
     permissionLevel: PermissionLevels.user,
   })
 
-  await RepositoryManager.userRepository.save(user)
+  await user.save()
 
   const { token } = await signIn(new SignInData(data.username, data.password))
 

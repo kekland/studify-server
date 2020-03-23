@@ -1,11 +1,11 @@
 import { IValidationSettings, validateRequest } from "../validation/validation";
 import { Request, Response } from "express";
-import { User } from "../classes/user";
+import { User } from "../entities/user";
 import { Errors } from "../validation/errors";
 import { classToPlain } from "class-transformer";
 import { AuthorizedMethod, UnauthorizedMethod } from "../methods/utils";
 
-export const generateEndpoint = <Req, Res>(task: (user: User | null, data: Req) => Promise<Res>, validation: IValidationSettings<Req>, outputCaster: (data: Res) => any = classToPlain) => {
+export const generateEndpoint = <Req, Res>(task: (user: User | undefined, data: Req) => Promise<Res>, validation: IValidationSettings<Req>, outputCaster: (data: Res) => any = classToPlain) => {
   return async (req: Request, res: Response) => {
     try {
       const { user, data } = await validateRequest(req, validation)
@@ -14,7 +14,9 @@ export const generateEndpoint = <Req, Res>(task: (user: User | null, data: Req) 
       res.send(outputCaster(responseBody))
     }
     catch (e) {
-      res.status(e.code ?? 500).send(e ?? Errors.internalServerError)
+      let errorBody = e
+      if (errorBody == {}) errorBody = Errors.internalServerError
+      res.status(e.errorCode ?? 500).send(errorBody)
     }
   }
 }

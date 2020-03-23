@@ -3,43 +3,44 @@ import { Request } from 'express'
 import { verify } from 'jsonwebtoken'
 import { configuration } from "../config";
 import { Errors } from "./errors";
-import { User } from "../classes/user";
-import { RepositoryManager } from "../database/database";
-import { ObjectId, ObjectID } from "mongodb";
+import { User } from "../entities/user";
 import { plainToClass } from 'class-transformer'
-import { ClassType } from "mongodb-typescript";
 import { validate } from 'class-validator'
+import { findUser } from "../methods/user";
+import { ClassType } from "class-transformer/ClassTransformer";
 
 export interface IValidationSettings<T> {
   permission?: PermissionLevel,
   validateUser?: boolean,
   validateBody?: boolean,
-  additionalPermissionChecks?: (user: User | null, data: T) => Promise<boolean>,
+  populateUser?: boolean,
+  additionalPermissionChecks?: (user: User | undefined, data: T) => Promise<boolean>,
   inputClass: ClassType<T>,
 }
 
-export const validateRequest = async <T>(req: Request, settings: IValidationSettings<T>): Promise<{ user: User | null, data: T }> => {
+export const validateRequest = async <T>(req: Request, settings: IValidationSettings<T>): Promise<{ user: User | undefined, data: T }> => {
   let token = req.headers.authorization
   const permissionLevel = settings.permission ?? 1
   const validateUser = settings.validateUser ?? true
   const validateBody = settings.validateBody ?? true
+  const populateUser = settings.populateUser ?? false
   const additionalPermissionChecks = settings.additionalPermissionChecks
   const inputClass = settings.inputClass
 
   try {
     // Verify the JWT token
-    let user: User | null = null
+    let user: User | undefined
     if (validateUser) {
       if (!token || !token.startsWith('Bearer')) throw Errors.invalidAuthentication
       token = token.replace('Bearer ', '')
-      
+
       const payload: any = verify(token, configuration.jwt)
       if (typeof payload === 'string') throw Errors.invalidAuthentication
 
       const id = payload.id
 
       // Find the user
-      user = await RepositoryManager.userRepository.findById(new ObjectId(id))
+      user = await findUser({ id }, populateUser)
 
       // Validate the user and his permissions
       if (user == null) throw Errors.invalidAuthentication

@@ -6,11 +6,13 @@ import { generateEndpoint, generateUnauthorizedMethodEndpoint } from './utils'
 const signIn = generateUnauthorizedMethodEndpoint<AuthMethods.SignInData, AuthMethods.SignInResponse>(AuthMethods.signIn, {
   inputClass: AuthMethods.SignInData,
   validateUser: false,
+  populateUser: true,
 })
 
 const signUp = generateUnauthorizedMethodEndpoint<AuthMethods.SignUpData, AuthMethods.SignUpResponse>(AuthMethods.signUp, {
   inputClass: AuthMethods.SignUpData,
   validateUser: false,
+  populateUser: true,
 })
 
 export const authRouter: () => Router = () => {

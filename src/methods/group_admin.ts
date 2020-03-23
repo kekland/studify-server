@@ -1,9 +1,6 @@
 import { AuthorizedMethod, UnauthorizedMethod } from "./utils";
-import { Group } from "../classes/group";
-import { RepositoryManager } from "../database/database";
-import { ObjectId } from "mongodb";
+import { Group } from "../entities/group";
 import { Errors } from "../validation/errors";
-import { Repository } from "mongodb-typescript";
 import { MinLength, IsNotEmpty, IsNumber } from "class-validator";
 import { getGroup } from "./group";
 
@@ -40,12 +37,14 @@ export const createGroup: AuthorizedMethod<GroupCreateData, Group> = async (user
     colorId: data.colorId,
     creator: user
   })
-
-  await RepositoryManager.groupRepository.save(group)
+  
+  await group.save()
 
   user.groups.push(group)
-  await RepositoryManager.userRepository.update(user)
+  user.createdGroups.push(group)
+  await user.save()
 
+  console.log(group)
   return group
 }
 
@@ -58,6 +57,6 @@ export const updateGroup: AuthorizedMethod<GroupUpdateData, Group> = async (user
   group.description = data.description
   group.colorId = data.colorId
 
-  await RepositoryManager.groupRepository.update(group)
+  await group.save()
   return group
 }

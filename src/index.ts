@@ -1,14 +1,13 @@
 import { configuration } from "./config"
-import { MongoClient } from "mongodb"
-import { RepositoryManager } from "./database/database"
 import { authRouter } from "./router/auth"
 import express, { Router } from 'express'
 import bodyParser from 'body-parser'
+import { createConnection } from 'typeorm'
 import { groupRouter } from "./router/group"
 
 const bootstrap = async () => {
   // Load configuration
-  const { port, mongo } = configuration
+  const { port, options } = configuration
 
   // Load Express
   const app = express()
@@ -19,12 +18,9 @@ const bootstrap = async () => {
   })
 
   // Connect to mongo
-  const client = new MongoClient(mongo.uri, { useNewUrlParser: true })
-  await client.connect()
-
-  // Initialize repositories
-  RepositoryManager.initialize(client)
-
+  const connection = await createConnection(options)
+  // await connection.connect()
+  
   // Setup routers
   const routers: { [key: string]: Router } = {
     '/auth': authRouter(),
