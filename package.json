@@ -19,5 +19,10 @@
     "socket.io"
   ],
   "author": "kekland <kk.erzhan@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "lapisdb": "^0.4.4",
+    "socket.io": "^2.3.0"
+  }
 }
