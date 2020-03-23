@@ -22,7 +22,12 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.17.1",
-    "lapisdb": "^0.4.4",
+    "mongodb": "^3.5.5",
+    "mongodb-typescript": "^2.2.0",
+    "reflect-metadata": "^0.1.13",
     "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/mongodb": "^3.5.2"
   }
 }
