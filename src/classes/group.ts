@@ -7,6 +7,7 @@ export interface IGroup {
   name: string;
   description?: string;
   colorId: number;
+  creator: User;
 }
 
 export class Group {
@@ -17,11 +18,14 @@ export class Group {
 
   colorId!: number;
 
+  @ref() creator!: User;
+
   constructor(data?: IGroup) {
     if(data) {
       this.name = data.name
       this.description = data.description
       this.colorId = data.colorId
+      this.creator = data.creator
     }
   }
 }

@@ -19,7 +19,7 @@ export interface IValidationSettings<T> {
 }
 
 export const validateRequest = async <T>(req: Request, settings: IValidationSettings<T>): Promise<{ user: User | null, data: T }> => {
-  const token = req.cookies?.token
+  let token = req.headers.authorization
   const permissionLevel = settings.permission ?? 1
   const validateUser = settings.validateUser ?? true
   const validateBody = settings.validateBody ?? true
@@ -30,6 +30,9 @@ export const validateRequest = async <T>(req: Request, settings: IValidationSett
     // Verify the JWT token
     let user: User | null = null
     if (validateUser) {
+      if (!token || !token.startsWith('Bearer')) throw Errors.invalidAuthentication
+      token = token.replace('Bearer ', '')
+      
       const payload: any = verify(token, configuration.jwt)
       if (typeof payload === 'string') throw Errors.invalidAuthentication
 

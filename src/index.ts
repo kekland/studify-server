@@ -4,6 +4,7 @@ import { RepositoryManager } from "./database/database"
 import { authRouter } from "./router/auth"
 import express, { Router } from 'express'
 import bodyParser from 'body-parser'
+import { groupRouter } from "./router/group"
 
 const bootstrap = async () => {
   // Load configuration
@@ -27,6 +28,7 @@ const bootstrap = async () => {
   // Setup routers
   const routers: { [key: string]: Router } = {
     '/auth': authRouter(),
+    '/group': groupRouter(),
   }
 
   Object.keys(routers).forEach(key => app.use(key, routers[key]))

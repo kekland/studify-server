@@ -7,6 +7,7 @@ import { configuration } from "../config";
 import { User } from "../classes/user";
 import { PermissionLevels } from "../validation/permissions";
 import { RepositoryManager } from "../database/database";
+import { UnauthorizedMethod } from "./utils";
 
 export class SignInData {
   @IsNotEmpty()
@@ -44,7 +45,7 @@ export interface SignUpResponse {
   user: User;
 }
 
-export const signIn = async (credentials: SignInData): Promise<SignInResponse> => {
+export const signIn: UnauthorizedMethod<SignInData, SignInResponse> = async (credentials) => {
   const user = await UserMethods.findUser({ username: credentials.username })
 
   if (!user) throw Errors.invalidCredentials
@@ -60,7 +61,7 @@ export const signIn = async (credentials: SignInData): Promise<SignInResponse> =
   }
 }
 
-export const signUp = async (data: SignUpData): Promise<SignUpResponse> => {
+export const signUp: UnauthorizedMethod<SignUpData, SignUpResponse> = async (data) => {
   const userExists = (await UserMethods.findUser({ username: data.username, email: data.email })) != null
 
   if (userExists) throw Errors.userExists
