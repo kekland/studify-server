@@ -1,23 +1,23 @@
 import { Router, Request, Response } from 'express'
-import { validateRequest } from '../validation/validation'
-import * as GroupMethods from '../methods/group'
-import * as GroupAdminMethods from '../methods/group_admin'
 import { generateEndpoint, generateUnauthorizedMethodEndpoint, generateAuthorizedMethodEndpoint } from './utils'
 import { Group } from '../entities/group'
+import { GroupUpdateData, GroupCreateData, GroupGetData, GroupGetResponse } from '../methods/group/_data'
+import { GroupMethods } from '../methods/group/group'
+import { GroupAdminMethods } from '../methods/group/group_admin'
 
-const getGroup = generateUnauthorizedMethodEndpoint<GroupMethods.GroupGetData, Group | undefined>(GroupMethods.getGroup, {
-  inputClass: GroupMethods.GroupGetData,
+const getGroup = generateUnauthorizedMethodEndpoint<GroupGetData, GroupGetResponse>(GroupMethods.getGroup, {
+  inputClass: GroupGetData,
   validateUser: false,
-})
+}, GroupGetResponse.transform)
 
-const createGroup = generateAuthorizedMethodEndpoint<GroupAdminMethods.GroupCreateData, Group>(GroupAdminMethods.createGroup, {
-  inputClass: GroupAdminMethods.GroupCreateData,
+const createGroup = generateAuthorizedMethodEndpoint<GroupCreateData, Group>(GroupAdminMethods.createGroup, {
+  inputClass: GroupCreateData,
   populateUser: true,
-})
+}, Group.transform)
 
-const updateGroup = generateAuthorizedMethodEndpoint<GroupAdminMethods.GroupUpdateData, Group>(GroupAdminMethods.updateGroup, {
-  inputClass: GroupAdminMethods.GroupUpdateData,
-})
+const updateGroup = generateAuthorizedMethodEndpoint<GroupUpdateData, Group>(GroupAdminMethods.updateGroup, {
+  inputClass: GroupUpdateData,
+}, Group.transform)
 
 export const groupRouter: () => Router = () => {
   const router = Router()

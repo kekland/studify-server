@@ -25,7 +25,7 @@ export class Group extends BaseEntity {
   @ManyToMany(type => User, user => user.groups)
   users!: User[];
 
-  @ManyToOne(type => User, user => user.createdGroups)
+  @ManyToOne(type => User, user => user.createdGroups, { eager: true })
   creator!: User;
 
   @CreateDateColumn()
@@ -33,7 +33,7 @@ export class Group extends BaseEntity {
 
   @UpdateDateColumn()
   updated!: Date;
-  
+
   constructor(data?: IGroup) {
     super()
     if (data) {
@@ -41,6 +41,19 @@ export class Group extends BaseEntity {
       this.description = data.description
       this.colorId = data.colorId
       this.creator = data.creator
+    }
+  }
+
+  static transform(data: Group) {
+    return {
+      id: data.id,
+      name: data.name,
+      description: data.description,
+      colorId: data.colorId,
+      users: data.users ? data.users.map(User.transformMinimal) : undefined,
+      creator: User.transformMinimal(data.creator),
+      created: data.created,
+      updated: data.updated,
     }
   }
 }

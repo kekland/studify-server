@@ -10,6 +10,7 @@ export interface IUser {
   hash: string;
 
   groups: Group[];
+  createdGroups: Group[];
 
   permissionLevel: number;
 }
@@ -57,17 +58,42 @@ export class User extends BaseEntity {
       this.name = data.name
       this.hash = data.hash
       this.groups = data.groups
+      this.createdGroups = data.createdGroups
       this.permissionLevel = data.permissionLevel
     }
   }
 
-  toSimplified() {
+  static transform(data: User) {
     return {
-      id: this.id,
-      username: this.username,
-      email: this.email,
-      name: this.name,
-      created: this.created,
+      id: data.id,
+      username: data.username,
+      email: data.email,
+      name: data.name,
+      created: data.created,
+      updated: data.updated,
+    }
+  }
+
+  static transformOwner(data: User) {
+    console.log(data)
+    return {
+      id: data.id,
+      username: data.username,
+      email: data.email,
+      name: data.name,
+      groups: data.groups ? data.groups.map(group => Group.transform(group)) : undefined,
+      createdGroups: data.createdGroups ? data.createdGroups.map(group => Group.transform(group)) : undefined,
+      created: data.created,
+      updated: data.updated,
+    }
+  }
+
+  static transformMinimal(data: User) {
+    return {
+      id: data.id,
+      username: data.username,
+      email: data.email,
+      name: data.name,
     }
   }
 }

@@ -5,13 +5,20 @@ import { Errors } from "../validation/errors";
 import { classToPlain } from "class-transformer";
 import { AuthorizedMethod, UnauthorizedMethod } from "../methods/utils";
 
-export const generateEndpoint = <Req, Res>(task: (user: User | undefined, data: Req) => Promise<Res>, validation: IValidationSettings<Req>, outputCaster: (data: Res) => any = classToPlain) => {
+type Transformer<Res> = (data: NonNullable<Res>) => any
+const defaultTransformer = (data: any) => data
+
+export const generateEndpoint = <Req, Res>(task: (user: User | undefined, data: Req) => Promise<Res>, validation: IValidationSettings<Req>, transformer: Transformer<Res> = defaultTransformer) => {
   return async (req: Request, res: Response) => {
     try {
       const { user, data } = await validateRequest(req, validation)
-      console.log()
       const responseBody = await task(user, data)
-      res.send(outputCaster(responseBody))
+      if (responseBody) {
+        res.send(classToPlain(transformer(responseBody as NonNullable<Res>)))
+      }
+      else {
+        res.send()
+      }
     }
     catch (e) {
       let errorBody = e
@@ -21,17 +28,17 @@ export const generateEndpoint = <Req, Res>(task: (user: User | undefined, data: 
   }
 }
 
-export const generateAuthorizedMethodEndpoint = <Req, Res>(method: AuthorizedMethod<Req, Res>, validation: IValidationSettings<Req>, outputCaster: (data: Res) => any = classToPlain) => {
+export const generateAuthorizedMethodEndpoint = <Req, Res>(method: AuthorizedMethod<Req, Res>, validation: IValidationSettings<Req>, transformer: Transformer<Res> = defaultTransformer) => {
   return generateEndpoint(async (user, data) => {
     if (!user) throw Errors.invalidAuthentication
     const res = await method(user, data)
     return res
-  }, validation, outputCaster)
+  }, validation, transformer)
 }
 
-export const generateUnauthorizedMethodEndpoint = <Req, Res>(method: UnauthorizedMethod<Req, Res>, validation: IValidationSettings<Req>, outputCaster: (data: Res) => any = classToPlain) => {
+export const generateUnauthorizedMethodEndpoint = <Req, Res>(method: UnauthorizedMethod<Req, Res>, validation: IValidationSettings<Req>, transformer: Transformer<Res> = defaultTransformer) => {
   return generateEndpoint(async (user, data) => {
     const res = await method(data)
     return res
-  }, validation, outputCaster)
+  }, validation, transformer)
 }

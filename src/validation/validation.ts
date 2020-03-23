@@ -6,8 +6,8 @@ import { Errors } from "./errors";
 import { User } from "../entities/user";
 import { plainToClass } from 'class-transformer'
 import { validate } from 'class-validator'
-import { findUser } from "../methods/user";
 import { ClassType } from "class-transformer/ClassTransformer";
+import { UserMethods } from "../methods/user/user";
 
 export interface IValidationSettings<T> {
   permission?: PermissionLevel,
@@ -40,7 +40,7 @@ export const validateRequest = async <T>(req: Request, settings: IValidationSett
       const id = payload.id
 
       // Find the user
-      user = await findUser({ id }, populateUser)
+      user = await UserMethods.findUser({ id }, populateUser)
 
       // Validate the user and his permissions
       if (user == null) throw Errors.invalidAuthentication

@@ -43,4 +43,16 @@ export class Message extends BaseEntity {
       this.group = data.group
     }
   }
+
+  static transform(data: Message) {
+    return {
+      id: data.id,
+      body: data.body,
+      attachments: data.attachments,
+      user: data.user ? User.transform(data.user) : undefined,
+      group: data.group ? Group.transform(data.group) : undefined,
+      created: data.created,
+      updated: data.updated,
+    }
+  }
 }
