@@ -1,0 +1,23 @@
+{
+  "name": "studify-server",
+  "version": "0.0.0",
+  "description": "A server for studify-app built with TypeScript",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "start": "node build/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/kekland/studify-server"
+  },
+  "keywords": [
+    "typescript",
+    "server",
+    "express",
+    "socket.io"
+  ],
+  "author": "kekland <kk.erzhan@gmail.com>",
+  "license": "MIT"
+}
