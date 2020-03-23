@@ -10,8 +10,6 @@ export class MessagingSocket {
   static server: Server
 
   static async initialize() {
-    const groups = await GroupMethods.getAllGroups()
-
     this.server.on('connection', async (socket) => {
       const user = await checkSocketAuthentication(socket)
       if (!user) {
