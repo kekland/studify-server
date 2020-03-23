@@ -1,6 +1,7 @@
 import { id, ref, nested } from 'mongodb-typescript'
 import { ObjectId } from 'mongodb'
 import { Group } from './group';
+import { Exclude, Type, Transform } from 'class-transformer';
 
 export interface IUser {
   username: string;
@@ -16,15 +17,16 @@ export interface IUser {
 }
 
 export class User {
+  @Transform(value => value.toString(), { toPlainOnly: true })
   @id id!: ObjectId;
 
   username!: string;
   email!: string;
   name!: string;
 
-  hash!: string;
+  @Exclude({ toPlainOnly: true }) hash!: string;
 
-  permissionLevel!: number;
+  @Exclude({ toPlainOnly: true }) permissionLevel!: number;
 
   @ref() @nested(() => Group) groups!: Group[];
   @ref() @nested(() => User) friends!: User[];

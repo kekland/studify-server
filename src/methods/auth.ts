@@ -1,4 +1,4 @@
-import { IsNotEmpty } from "class-validator"
+import { IsNotEmpty, MinLength, IsEmail } from "class-validator"
 import * as UserMethods from './user'
 import { compare, hash, genSaltSync } from 'bcrypt'
 import { sign } from 'jsonwebtoken'
@@ -6,6 +6,7 @@ import { Errors } from "../validation/errors";
 import { configuration } from "../config";
 import { User } from "../classes/user";
 import { PermissionLevels } from "../validation/permissions";
+import { RepositoryManager } from "../database/database";
 
 export class SignInData {
   @IsNotEmpty()
@@ -25,13 +26,13 @@ export interface SignInResponse {
 }
 
 export class SignUpData {
-  @IsNotEmpty()
+  @IsEmail()
   email!: string;
 
-  @IsNotEmpty()
+  @MinLength(6)
   username!: string;
 
-  @IsNotEmpty()
+  @MinLength(8)
   password!: string;
 
   @IsNotEmpty()
@@ -62,7 +63,7 @@ export const signIn = async (credentials: SignInData): Promise<SignInResponse> =
 export const signUp = async (data: SignUpData): Promise<SignUpResponse> => {
   const userExists = (await UserMethods.findUser({ username: data.username, email: data.email })) != null
 
-  if (userExists) throw Errors.invalidRequest
+  if (userExists) throw Errors.userExists
 
   const passwordHash = await hash(data.password, genSaltSync())
 
@@ -75,6 +76,8 @@ export const signUp = async (data: SignUpData): Promise<SignUpResponse> => {
     groups: [],
     permissionLevel: PermissionLevels.user,
   })
+
+  await RepositoryManager.userRepository.save(user)
 
   const { token } = await signIn(new SignInData(data.username, data.password))
 

@@ -2,30 +2,34 @@ import { configuration } from "./config"
 import { MongoClient } from "mongodb"
 import { RepositoryManager } from "./database/database"
 import { authRouter } from "./router/auth"
-import express from 'express'
+import express, { Router } from 'express'
 import bodyParser from 'body-parser'
 
 const bootstrap = async () => {
   // Load configuration
-  const {port, uri} = configuration
+  const { port, mongo } = configuration
 
   // Load Express
   const app = express()
   app.use(bodyParser())
+  app.use((req, res, next) => {
+    console.log({ ip: req.ip, body: req.body, url: req.url })
+    next()
+  })
 
   // Connect to mongo
-  const client = new MongoClient(uri, { useNewUrlParser: true })
+  const client = new MongoClient(mongo.uri, { useNewUrlParser: true })
   await client.connect()
 
   // Initialize repositories
   RepositoryManager.initialize(client)
-  
-  // Setup routers
-  const routers = [
-    authRouter(),
-  ]
 
-  routers.forEach(router => app.use(router))
+  // Setup routers
+  const routers: { [key: string]: Router } = {
+    '/auth': authRouter(),
+  }
+
+  Object.keys(routers).forEach(key => app.use(key, routers[key]))
 
   // Start server on port
   app.listen(port)

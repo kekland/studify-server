@@ -19,5 +19,13 @@ export const Errors = {
   invalidCredentials: {
     message: 'Invalid username or password',
     code: 400,
-  }
+  },
+  userExists: {
+    message: 'User with this username or email already exists',
+    code: 400,
+  },
+  internalServerError: {
+    message: 'Internal server error occurred',
+    code: 500,
+  },
 }

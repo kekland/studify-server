@@ -19,7 +19,7 @@ export interface IValidationSettings<T> {
 }
 
 export const validateRequest = async <T>(req: Request, settings: IValidationSettings<T>): Promise<{ user: User | null, data: T }> => {
-  const token = req.cookies.token
+  const token = req.cookies?.token
   const permissionLevel = settings.permission ?? 1
   const validateUser = settings.validateUser ?? true
   const validateBody = settings.validateBody ?? true
