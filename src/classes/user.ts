@@ -8,10 +8,11 @@ export interface IUser {
   name: string;
 
   hash: string;
-  salt: string;
 
   groups: Group[];
   friends: User[];
+
+  permissionLevel: number;
 }
 
 export class User {
@@ -22,7 +23,8 @@ export class User {
   name!: string;
 
   hash!: string;
-  salt!: string;
+
+  permissionLevel!: number;
 
   @ref() @nested(() => Group) groups!: Group[];
   @ref() @nested(() => User) friends!: User[];
@@ -33,9 +35,9 @@ export class User {
       this.email = data.email
       this.name = data.name
       this.hash = data.hash
-      this.salt = data.salt
       this.groups = data.groups
       this.friends = data.friends
+      this.permissionLevel = data.permissionLevel
     }
   }
 }

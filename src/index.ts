@@ -8,7 +8,7 @@ const bootstrap = async () => {
 
   await client.connect()
 
-  const repositoryManager = new RepositoryManager(client)
+  RepositoryManager.initialize(client)
   console.log('Done!')
 }
 

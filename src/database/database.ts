@@ -5,13 +5,13 @@ import { Group } from "../classes/group";
 import { MongoClient } from "mongodb";
 
 export class RepositoryManager {
-  userRepository: Repository<User>
-  messageRepository: Repository<Message>
-  groupRepository: Repository<Group>
+  static userRepository: Repository<User>
+  static messageRepository: Repository<Message>
+  static groupRepository: Repository<Group>
 
-  constructor(client: MongoClient) {
-    this.userRepository = new Repository<User>(User, client, 'users')
-    this.messageRepository = new Repository<Message>(Message, client, 'messages')
-    this.groupRepository = new Repository<Group>(Group, client, 'groups')
+  static initialize(client: MongoClient) {
+    RepositoryManager.userRepository = new Repository<User>(User, client, 'users')
+    RepositoryManager.messageRepository = new Repository<Message>(Message, client, 'messages')
+    RepositoryManager.groupRepository = new Repository<Group>(Group, client, 'groups')
   }
 }
