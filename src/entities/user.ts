@@ -63,6 +63,16 @@ export class User extends BaseEntity {
     }
   }
 
+  hasGroup(group: Group): boolean {
+    for(let subscribedGroup of this.groups) {
+      if(group.id === subscribedGroup.id) {
+        return true
+      }
+    }
+
+    return false
+  }
+
   static transform(data: User) {
     return {
       id: data.id,

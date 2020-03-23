@@ -49,10 +49,28 @@ export class Message extends BaseEntity {
       id: data.id,
       body: data.body,
       attachments: data.attachments,
-      user: data.user ? User.transform(data.user) : undefined,
-      group: data.group ? Group.transform(data.group) : undefined,
+      user: data.user ? User.transformMinimal(data.user) : undefined,
+      group: data.group ? Group.transformMinimal(data.group) : undefined,
       created: data.created,
       updated: data.updated,
+    }
+  }
+
+  static transformSocket(data: Message) {
+    return {
+      id: data.id,
+      body: data.body,
+      attachments: data.attachments,
+      user: User.transformMinimal(data.user),
+      created: data.created
+    }
+  }
+
+  static transformMinimal(data: Message) {
+    return {
+      id: data.id,
+      body: data.body,
+      attachments: data.attachments,
     }
   }
 }

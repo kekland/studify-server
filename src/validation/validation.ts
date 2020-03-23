@@ -8,6 +8,7 @@ import { plainToClass } from 'class-transformer'
 import { validate } from 'class-validator'
 import { ClassType } from "class-transformer/ClassTransformer";
 import { UserMethods } from "../methods/user/user";
+import { Socket } from "socket.io";
 
 export interface IValidationSettings<T> {
   permission?: PermissionLevel,
@@ -15,7 +16,7 @@ export interface IValidationSettings<T> {
   validateBody?: boolean,
   populateUser?: boolean,
   additionalPermissionChecks?: (user: User, data: T) => Promise<boolean>,
-  inputClass: ClassType<T>,
+  inputClass?: ClassType<T>,
 }
 
 export const validateRequest = async <T>(req: Request, settings: IValidationSettings<T>): Promise<{ user: User | undefined, data: T }> => {
@@ -47,10 +48,71 @@ export const validateRequest = async <T>(req: Request, settings: IValidationSett
       if (user.permissionLevel < permissionLevel) throw Errors.insufficientPermissions
     }
 
-    // Validate the body
-    const body = req.body
-    const data = plainToClass(inputClass, body)
+    let data: T = (req.body as T)
+    // Transform the body
+    if (inputClass) {
+      const body = req.body
+      data = plainToClass(inputClass, body)
+    }
 
+    // Validate the body
+    if (validateBody) {
+      const errors = await validate(data)
+
+      if (errors.length > 0) throw Errors.invalidRequest
+    }
+
+    // If additional checks are provided, check against them
+    if (validateUser && additionalPermissionChecks) {
+      const errored = await additionalPermissionChecks(user as User, data)
+      if (errored) throw Errors.insufficientPermissions
+    }
+
+    return { user, data }
+  }
+  catch (e) {
+    if (e === Errors.invalidRequest) throw Errors.invalidRequest
+    if (e === Errors.insufficientPermissions) throw Errors.insufficientPermissions
+    else throw Errors.invalidAuthentication
+  }
+}
+
+export const validateSocketRequest = async <T>(socket: Socket, body: any, settings: IValidationSettings<T>): Promise<{ user: User | undefined, data: T }> => {
+  let token = socket.handshake.query?.token
+  const permissionLevel = settings.permission ?? 1
+  const validateUser = settings.validateUser ?? true
+  const validateBody = settings.validateBody ?? true
+  const populateUser = settings.populateUser ?? false
+  const additionalPermissionChecks = settings.additionalPermissionChecks
+  const inputClass = settings.inputClass
+
+  try {
+    // Verify the JWT token
+    let user: User | undefined
+    if (validateUser) {
+      if (!token) throw Errors.invalidAuthentication
+      token = token.replace('Bearer ', '')
+
+      const payload: any = verify(token, configuration.jwt)
+      if (typeof payload === 'string') throw Errors.invalidAuthentication
+
+      const id = payload.id
+
+      // Find the user
+      user = await UserMethods.findUser({ id }, populateUser)
+
+      // Validate the user and his permissions
+      if (user == null) throw Errors.invalidAuthentication
+      if (user.permissionLevel < permissionLevel) throw Errors.insufficientPermissions
+    }
+
+    let data: T = (body as T)
+    // Transform the body
+    if (inputClass) {
+      data = plainToClass(inputClass, body)
+    }
+
+    // Validate the body
     if (validateBody) {
       const errors = await validate(data)
 

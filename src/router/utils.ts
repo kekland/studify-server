@@ -5,8 +5,8 @@ import { Errors } from "../validation/errors";
 import { classToPlain } from "class-transformer";
 import { AuthorizedMethod, UnauthorizedMethod } from "../methods/utils";
 
-type Transformer<Res> = (data: NonNullable<Res>) => any
-const defaultTransformer = (data: any) => data
+export type Transformer<Res> = (data: NonNullable<Res>) => any
+export const defaultTransformer = (data: any) => data
 
 export const generateEndpoint = <Req, Res>(task: (user: User | undefined, data: Req) => Promise<Res>, validation: IValidationSettings<Req>, transformer: Transformer<Res> = defaultTransformer) => {
   return async (req: Request, res: Response) => {

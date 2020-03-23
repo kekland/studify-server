@@ -4,10 +4,11 @@ import express, { Router } from 'express'
 import bodyParser from 'body-parser'
 import { createConnection } from 'typeorm'
 import { groupRouter } from "./router/group"
+import socketio from 'socket.io'
 
 const bootstrap = async () => {
   // Load configuration
-  const { port, options } = configuration
+  const { port, socketPort, options } = configuration
 
   // Load Express
   const app = express()
@@ -17,10 +18,13 @@ const bootstrap = async () => {
     next()
   })
 
+  // Load Socket.io
+  const io = socketio()
+
   // Connect to mongo
   const connection = await createConnection(options)
   // await connection.connect()
-  
+
   // Setup routers
   const routers: { [key: string]: Router } = {
     '/auth': authRouter(),
@@ -31,6 +35,7 @@ const bootstrap = async () => {
 
   // Start server on port
   app.listen(port)
+  io.listen(socketPort)
 }
 
 bootstrap()

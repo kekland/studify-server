@@ -56,4 +56,13 @@ export class Group extends BaseEntity {
       updated: data.updated,
     }
   }
+
+  static transformMinimal(data: Group) {
+    return {
+      id: data.id,
+      name: data.name,
+      description: data.description,
+      colorId: data.colorId,
+    }
+  }
 }

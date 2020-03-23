@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express'
 import { generateEndpoint, generateUnauthorizedMethodEndpoint, generateAuthorizedMethodEndpoint } from './utils'
 import { Group } from '../entities/group'
-import { GroupUpdateData, GroupCreateData, GroupGetData, GroupGetResponse } from '../methods/group/_data'
+import { GroupUpdateData, GroupCreateData, GroupGetData, GroupGetResponse, GroupGetMultipleResponse } from '../methods/group/_data'
 import { GroupMethods } from '../methods/group/group'
 import { GroupAdminMethods } from '../methods/group/group_admin'
 
@@ -9,6 +9,11 @@ const getGroup = generateUnauthorizedMethodEndpoint<GroupGetData, GroupGetRespon
   inputClass: GroupGetData,
   validateUser: false,
 }, GroupGetResponse.transform)
+
+const getAllGroups = generateUnauthorizedMethodEndpoint<{}, GroupGetMultipleResponse>(GroupMethods.getGroups, {
+  validateBody: false,
+  validateUser: false,
+}, GroupGetMultipleResponse.transform)
 
 const createGroup = generateAuthorizedMethodEndpoint<GroupCreateData, Group>(GroupAdminMethods.createGroup, {
   inputClass: GroupCreateData,
@@ -23,6 +28,7 @@ export const groupRouter: () => Router = () => {
   const router = Router()
 
   router.get('/', getGroup)
+  router.get('/all', getAllGroups)
   router.post('/', createGroup)
   router.put('/', updateGroup)
 

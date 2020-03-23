@@ -41,7 +41,20 @@ export class GroupGetResponse {
 
   static transform(data: GroupGetResponse) {
     return {
-      group: data.group? Group.transform(data.group) : undefined,
+      group: data.group ? Group.transform(data.group) : undefined,
+    }
+  }
+}
+export class GroupGetMultipleResponse {
+  groups: Group[];
+
+  constructor(groups: Group[]) {
+    this.groups = groups
+  }
+
+  static transform(data: GroupGetMultipleResponse) {
+    return {
+      groups: data.groups.map(group => Group.transform(group))
     }
   }
 }
