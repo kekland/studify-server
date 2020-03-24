@@ -11,7 +11,7 @@ export const generateSocketEventHandler = <Req, Res>
     validation: IValidationSettings<Req>) => {
   socket.on(event, async (body) => {
     try {
-      let contents = (typeof body === 'object')? body : JSON.parse(body)
+      let contents = (typeof body === 'object') ? body : JSON.parse(body)
       const { user, data } = await validateSocketRequest(socket, contents, {
         inputClass: validation.inputClass,
         validateBody: validation.validateBody,
@@ -19,13 +19,11 @@ export const generateSocketEventHandler = <Req, Res>
         validateUser: true,
       })
 
-      console.log('AAABAA')
-
       await task(data)
     }
     catch (e) {
       let errorBody = e
-      if (!errorBody) errorBody = Errors.internalServerError
+      if (Object.keys(e).length === 0) errorBody = Errors.internalServerError
       socket.to(socket.id).error(errorBody)
     }
   })

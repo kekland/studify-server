@@ -22,8 +22,10 @@ export class GroupAdminMethods {
     return group
   }
 
-  static updateGroup: AuthorizedMethod<GroupUpdateData, Group> = async (user, data) => {
-    const group = await GroupMethods.getGroupById(data.id)
+  static updateGroup: AuthorizedMethod<GroupUpdateData, Group> = async (user, data, params) => {
+    const groupId = params?.groupId
+    if (!groupId) throw Errors.invalidRequest
+    const group = await GroupMethods.getGroupById(groupId)
 
     if (!group) throw Errors.invalidRequest
     if (group.creator.id !== user.id) throw Errors.insufficientPermissions

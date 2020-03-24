@@ -64,8 +64,6 @@ export class User extends BaseEntity {
   }
 
   hasGroup(group: Group): boolean {
-    console.log(group)
-    console.log(this.groups)
     for(let subscribedGroup of this.groups) {
       if(group.id === subscribedGroup.id) {
         return true
@@ -87,7 +85,6 @@ export class User extends BaseEntity {
   }
 
   static transformOwner(data: User) {
-    console.log(data)
     return {
       id: data.id,
       username: data.username,

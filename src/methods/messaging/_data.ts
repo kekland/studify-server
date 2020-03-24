@@ -35,10 +35,7 @@ export class SendMessageResponse {
   }
 }
 
-export class GetMessagesData {
-  @IsNotEmpty()
-  groupId!: string;
-
+export class PaginatedData {
   @IsNumber()
   @Max(30)
   limit!: number;

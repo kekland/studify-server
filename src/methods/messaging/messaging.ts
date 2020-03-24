@@ -1,5 +1,5 @@
 import { AuthorizedMethod } from "../utils";
-import { SendMessageData, SendMessageResponse, GetMessagesData, GetMessagesResponse } from "./_data";
+import { SendMessageData, SendMessageResponse, PaginatedData, GetMessagesResponse } from "./_data";
 import { GroupMethods } from "../group/group";
 import { Errors } from "../../validation/errors";
 import { Message } from "../../entities/message";
@@ -8,11 +8,9 @@ export class MessagingMethods {
   static sendMessage: AuthorizedMethod<SendMessageData, SendMessageResponse> = async (user, data) => {
     const group = await GroupMethods.getGroupById(data.groupId)
 
-    console.log(1)
     if (!group) throw Errors.invalidRequest
     if (!user.hasGroup(group)) throw Errors.insufficientPermissions
 
-    console.log(2)
     const message = new Message({
       body: data.body,
       attachments: data.attachments,
@@ -22,12 +20,14 @@ export class MessagingMethods {
 
     await message.save()
 
-    console.log(message)
     return new SendMessageResponse(message)
   }
 
-  static getMessages: AuthorizedMethod<GetMessagesData, GetMessagesResponse> = async (user, data) => {
-    const group = await GroupMethods.getGroupById(data.groupId)
+  static getMessages: AuthorizedMethod<PaginatedData, GetMessagesResponse> = async (user, data, params) => {
+    const groupId = params?.groupId
+    if (!groupId) throw Errors.invalidRequest
+
+    const group = await GroupMethods.getGroupById(groupId)
 
     if (!group) throw Errors.invalidRequest
     if (!user.hasGroup(group)) throw Errors.insufficientPermissions

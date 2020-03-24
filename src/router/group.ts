@@ -1,21 +1,22 @@
 import { Router, Request, Response } from 'express'
 import { generateEndpoint, generateUnauthorizedMethodEndpoint, generateAuthorizedMethodEndpoint } from './utils'
 import { Group } from '../entities/group'
-import { GroupUpdateData, GroupCreateData, GroupGetData, GroupGetResponse, GroupGetMultipleResponse } from '../methods/group/_data'
+import { GroupUpdateData, GroupCreateData, GroupGetData, GroupGetResponse, GroupGetMultipleResponse, GroupGetAllData, GroupJoinData, GroupJoinResponse, GroupLeaveResponse, GroupLeaveData } from '../methods/group/_data'
 import { GroupMethods } from '../methods/group/group'
 import { GroupAdminMethods } from '../methods/group/group_admin'
-import { GetMessagesData, GetMessagesResponse } from '../methods/messaging/_data'
+import { PaginatedData, GetMessagesResponse } from '../methods/messaging/_data'
 import { MessagingMethods } from '../methods/messaging/messaging'
 import { ClassType } from "class-transformer/ClassTransformer";
 
 const getGroup = generateUnauthorizedMethodEndpoint<GroupGetData, GroupGetResponse>(GroupMethods.getGroup, {
   inputClass: GroupGetData,
   validateUser: false,
+  validateBody: false,
 }, GroupGetResponse.transform)
 
-const getAllGroups = generateUnauthorizedMethodEndpoint<{}, GroupGetMultipleResponse>(GroupMethods.getGroups, {
+const getAllGroups = generateUnauthorizedMethodEndpoint<GroupGetAllData, GroupGetMultipleResponse>(GroupMethods.getGroups, {
+  inputClass: GroupGetAllData,
   validateBody: false,
-  validateUser: false,
 }, GroupGetMultipleResponse.transform)
 
 const createGroup = generateAuthorizedMethodEndpoint<GroupCreateData, Group>(GroupAdminMethods.createGroup, {
@@ -27,19 +28,31 @@ const updateGroup = generateAuthorizedMethodEndpoint<GroupUpdateData, Group>(Gro
   inputClass: GroupUpdateData,
 }, Group.transform)
 
-const getMessages = generateAuthorizedMethodEndpoint<GetMessagesData, GetMessagesResponse>(MessagingMethods.getMessages, {
-  inputClass: GetMessagesData,
+const getMessages = generateAuthorizedMethodEndpoint<PaginatedData, GetMessagesResponse>(MessagingMethods.getMessages, {
+  inputClass: PaginatedData,
   populateUser: true
 }, GetMessagesResponse.transform)
+
+const joinGroup = generateAuthorizedMethodEndpoint<GroupJoinData, GroupJoinResponse>(GroupMethods.joinGroup, {
+  inputClass: GroupJoinData,
+  populateUser: true
+}, GroupJoinResponse.transform)
+
+const leaveGroup = generateAuthorizedMethodEndpoint<GroupLeaveData, GroupLeaveResponse>(GroupMethods.leaveGroup, {
+  inputClass: GroupLeaveData,
+  populateUser: true
+}, GroupLeaveResponse.transform)
 
 export const groupRouter: () => Router = () => {
   const router = Router()
 
-  router.post('/id', getGroup)
-  router.post('/all', getAllGroups)
-  router.post('/messages', getMessages)
+  router.get('/:groupId', getGroup)
+  router.get('/all', getAllGroups)
+  router.get('/:groupId/messages', getMessages)
   router.post('/create', createGroup)
-  router.post('/update', updateGroup)
+  router.post('/:groupId/join', joinGroup)
+  router.post('/:groupId/leave', leaveGroup)
+  router.put('/:groupId/update', updateGroup)
 
   return router
 }

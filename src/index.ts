@@ -16,7 +16,6 @@ const bootstrap = async () => {
   const expressServer = express()
   expressServer.use(bodyParser())
   expressServer.use((req, res, next) => {
-    console.log({ ip: req.ip, body: req.body, url: req.url })
     next()
   })
 

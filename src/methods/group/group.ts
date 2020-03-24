@@ -1,6 +1,7 @@
-import { GroupGetResponse, GroupGetData, GroupGetMultipleResponse } from "./_data";
-import { UnauthorizedMethod } from "../utils";
+import { GroupGetResponse, GroupGetData, GroupGetMultipleResponse, GroupGetAllData, GroupJoinData, GroupJoinResponse, GroupLeaveData, GroupLeaveResponse } from "./_data";
+import { UnauthorizedMethod, AuthorizedMethod } from "../utils";
 import { Group } from "../../entities/group";
+import { Errors } from "../../validation/errors";
 
 export class GroupMethods {
   static async getGroupById(id: string): Promise<Group | undefined> {
@@ -13,13 +14,42 @@ export class GroupMethods {
     return groups
   }
 
-  static getGroup: UnauthorizedMethod<GroupGetData, GroupGetResponse> = async (data) => {
-    const group = await GroupMethods.getGroupById(data.id)
+  static getGroup: UnauthorizedMethod<GroupGetData, GroupGetResponse> = async (data, params) => {
+    const groupId = params?.groupId
+    if (!groupId) return new GroupGetResponse(undefined);
+
+    const group = await GroupMethods.getGroupById(groupId)
     return new GroupGetResponse(group)
   }
 
-  static getGroups: UnauthorizedMethod<{}, GroupGetMultipleResponse> = async (data) => {
+  static getGroups: UnauthorizedMethod<GroupGetAllData, GroupGetMultipleResponse> = async (data) => {
     const groups = await GroupMethods.getAllGroups()
     return new GroupGetMultipleResponse(groups)
+  }
+
+  static joinGroup: AuthorizedMethod<GroupJoinData, GroupJoinResponse> = async (user, data, params) => {
+    const groupId = params?.groupId
+    if (!groupId) throw Errors.invalidRequest
+
+    const group = await GroupMethods.getGroupById(groupId)
+    if (!group) throw Errors.invalidRequest
+
+    user.groups.push(group)
+    await user.save()
+
+    return new GroupJoinResponse(group);
+  }
+
+  static leaveGroup: AuthorizedMethod<GroupLeaveData, GroupLeaveResponse> = async (user, data, params) => {
+    const groupId = params?.groupId
+    if (!groupId) throw Errors.invalidRequest
+
+    const group = await GroupMethods.getGroupById(groupId)
+    if (!group) throw Errors.invalidRequest
+
+    user.groups.splice(user.groups.findIndex(g => g.id === groupId), 1)
+    await user.save()
+
+    return new GroupJoinResponse(group);
   }
 }

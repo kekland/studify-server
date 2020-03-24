@@ -14,9 +14,6 @@ export class GroupCreateData {
 }
 
 export class GroupUpdateData {
-  @IsNotEmpty()
-  id!: string;
-
   @MinLength(6)
   name!: string;
 
@@ -28,8 +25,40 @@ export class GroupUpdateData {
 }
 
 export class GroupGetData {
-  @IsNotEmpty()
-  id!: string;
+}
+export class GroupGetAllData {
+}
+export class GroupJoinData {
+}
+export class GroupLeaveData {
+}
+
+export class GroupJoinResponse {
+  group: Group;
+
+  constructor(group: Group) {
+    this.group = group;
+  }
+
+  static transform(data: GroupJoinResponse) {
+    return {
+      group: Group.transform(data.group),
+    }
+  }
+}
+
+export class GroupLeaveResponse {
+  group: Group;
+
+  constructor(group: Group) {
+    this.group = group;
+  }
+
+  static transform(data: GroupJoinResponse) {
+    return {
+      group: Group.transform(data.group),
+    }
+  }
 }
 
 export class GroupGetResponse {
