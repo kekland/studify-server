@@ -22,6 +22,9 @@ export class Group extends BaseEntity {
   @Column()
   colorId!: number;
 
+  @Column()
+  userCount!: number; 
+
   @ManyToMany(type => User, user => user.groups)
   users!: User[];
 
@@ -41,6 +44,7 @@ export class Group extends BaseEntity {
       this.description = data.description
       this.colorId = data.colorId
       this.creator = data.creator
+      this.userCount = 1;
     }
   }
 
@@ -50,6 +54,7 @@ export class Group extends BaseEntity {
       name: data.name,
       description: data.description,
       colorId: data.colorId,
+      userCount: data.userCount,
       creator: User.transformMinimal(data.creator),
       created: data.created,
       updated: data.updated,
@@ -60,6 +65,7 @@ export class Group extends BaseEntity {
     return {
       id: data.id,
       name: data.name,
+      userCount: data.userCount,
       description: data.description,
       colorId: data.colorId,
     }

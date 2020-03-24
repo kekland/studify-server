@@ -1,6 +1,7 @@
 import { MinLength, IsNotEmpty, IsNumber } from "class-validator";
 import { Group } from "../../entities/group";
 import { Message } from "../../entities/message";
+import { User } from "../../entities/user";
 
 export class GroupCreateData {
   @MinLength(6)
@@ -84,6 +85,20 @@ export class GroupGetMultipleResponse {
   static transform(data: GroupGetMultipleResponse) {
     return {
       groups: data.groups.map(group => Group.transform(group))
+    }
+  }
+}
+
+export class GroupGetUsersResponse {
+  users: User[];
+
+  constructor(users: User[]) {
+    this.users = users
+  }
+
+  static transform(data: GroupGetUsersResponse) {
+    return {
+      users: data.users.map(user => User.transformMinimal(user))
     }
   }
 }

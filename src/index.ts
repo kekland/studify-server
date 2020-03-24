@@ -19,6 +19,7 @@ const bootstrap = async () => {
     setTimeout(() => next(), 550);
   })
   expressServer.use((req, res, next) => {
+    console.log(req.ip, req.url, req.params, req.body)
     next()
   })
 

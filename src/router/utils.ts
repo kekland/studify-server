@@ -21,6 +21,7 @@ export const generateEndpoint = <Req, Res>(task: (user: User | undefined, data: 
       }
     }
     catch (e) {
+      console.log(e)
       let errorBody = e
       if (Object.keys(e).length === 0) errorBody = Errors.internalServerError
       res.status(e.errorCode ?? 500).send(errorBody)

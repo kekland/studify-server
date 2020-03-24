@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express'
 import { generateEndpoint, generateUnauthorizedMethodEndpoint, generateAuthorizedMethodEndpoint } from './utils'
 import { Group } from '../entities/group'
-import { GroupUpdateData, GroupCreateData, GroupGetData, GroupGetResponse, GroupGetMultipleResponse, GroupGetAllData, GroupJoinData, GroupJoinResponse, GroupLeaveResponse, GroupLeaveData } from '../methods/group/_data'
+import { GroupUpdateData, GroupCreateData, GroupGetData, GroupGetResponse, GroupGetMultipleResponse, GroupGetAllData, GroupJoinData, GroupJoinResponse, GroupLeaveResponse, GroupLeaveData, GroupGetUsersResponse } from '../methods/group/_data'
 import { GroupMethods } from '../methods/group/group'
 import { GroupAdminMethods } from '../methods/group/group_admin'
 import { PaginatedData, GetMessagesResponse } from '../methods/messaging/_data'
@@ -33,6 +33,11 @@ const getMessages = generateAuthorizedMethodEndpoint<PaginatedData, GetMessagesR
   populateUser: true
 }, GetMessagesResponse.transform)
 
+const getUsers = generateAuthorizedMethodEndpoint<PaginatedData, GroupGetUsersResponse>(GroupMethods.getGroupUsers, {
+  inputClass: PaginatedData,
+  populateUser: true
+}, GroupGetUsersResponse.transform)
+
 const joinGroup = generateAuthorizedMethodEndpoint<GroupJoinData, GroupJoinResponse>(GroupMethods.joinGroup, {
   inputClass: GroupJoinData,
   populateUser: true
@@ -46,8 +51,9 @@ const leaveGroup = generateAuthorizedMethodEndpoint<GroupLeaveData, GroupLeaveRe
 export const groupRouter: () => Router = () => {
   const router = Router()
 
-  router.get('/:groupId', getGroup)
   router.get('/all', getAllGroups)
+  router.get('/:groupId', getGroup)
+  router.get('/:groupId/users', getUsers)
   router.get('/:groupId/messages', getMessages)
   router.post('/create', createGroup)
   router.post('/:groupId/join', joinGroup)

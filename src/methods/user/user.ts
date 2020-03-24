@@ -1,9 +1,10 @@
 import { User } from "../../entities/user";
 
+type Relation = 'groups' | 'createdGroups'
 export class UserMethods {
   static findUser = async (data: { username?: string, email?: string, id?: string }, populate = false): Promise<User | undefined> => {
     let user: User | undefined
-    let relations: string[] = []
+    let relations: Relation[] = []
 
     if (populate) relations = ['groups', 'createdGroups']
 
