@@ -7,17 +7,21 @@ import { createConnection } from 'typeorm'
 import { groupRouter } from "./router/group"
 import socketio from 'socket.io'
 import { MessagingSocket } from "./socket/messaging"
+import { Logging } from "./logging/logging";
 
 const bootstrap = async () => {
+  Logging.info('Bootstrap', 'Starting server')
   // Load configuration
   const { port, socketPort, options } = configuration
 
   // Load Express
   const expressServer = express()
   expressServer.use(bodyParser())
+
   expressServer.use((req, res, next) => {
     setTimeout(() => next(), 550);
   })
+
   expressServer.use((req, res, next) => {
     console.log(req.ip, req.url, req.params, req.body)
     next()
@@ -38,8 +42,10 @@ const bootstrap = async () => {
 
   Object.keys(routers).forEach(key => expressServer.use(key, routers[key]))
 
-  // Start server on port
+  Logging.info('Bootstrap', `Starting Express on port ${port}`)
   expressServer.listen(port)
+  
+  Logging.info('Bootstrap', `Starting Socket.io on port ${socketPort}`)
   socketServer.listen(socketPort)
 }
 
