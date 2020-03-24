@@ -22,6 +22,7 @@ export class MessagingSocket {
 
       const socketJoinRooms = () => {
         socket.leaveAll();
+        socket.join(socket.id)
         socket.join(user.groups.map(v => v.id))
       }
 

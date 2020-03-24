@@ -1,5 +1,7 @@
 import { IsNotEmpty, Max, IsNumber, IsArray, IsString, IsUrl, ValidateIf, IsOptional } from "class-validator";
 import { Message } from "../../entities/message";
+import { Transform, TransformPlainToClass } from "class-transformer";
+import { TransformationType } from "class-transformer/TransformOperationExecutor";
 
 export class SendMessageData {
   @IsNotEmpty()
@@ -36,11 +38,14 @@ export class SendMessageResponse {
 }
 
 export class PaginatedData {
+  @Transform((v, _) => parseInt(v), { toClassOnly: true })
   @IsNumber()
   @Max(30)
   limit!: number;
 
+  @Transform((v, _) => parseInt(v), { toClassOnly: true })
   @IsNotEmpty()
+  @IsNumber()
   skip!: number;
 }
 

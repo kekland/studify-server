@@ -33,8 +33,8 @@ export class MessagingMethods {
     if (!user.hasGroup(group)) throw Errors.insufficientPermissions
 
     const messages = await Message.createQueryBuilder('message').where('message.group = :groupId', { groupId: group.id })
-      .limit(data.limit)
       .skip(data.skip)
+      .take(data.limit)
       .leftJoinAndSelect('message.user', 'user')
       .orderBy('message.created', 'DESC')
       .getMany()
