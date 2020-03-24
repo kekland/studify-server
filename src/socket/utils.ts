@@ -4,12 +4,14 @@ import { IValidationSettings, validateSocketRequest } from '../validation/valida
 import { defaultTransformer, Transformer } from '../router/utils'
 import { classToPlain } from 'class-transformer'
 import { Errors } from '../validation/errors'
+import { Logging } from '../logging/logging'
 
 export const generateSocketEventHandler = <Req>
   (event: string, socket: Socket,
     task: (data: Req) => Promise<void>,
     validation: IValidationSettings<Req>) => {
   socket.on(event, async (body) => {
+    Logging.verbose(validation.inputClass?.name ?? 'MessagingSocket', `Emitted by ${socket.id}`)
     try {
       let contents = (typeof body === 'object') ? body : JSON.parse(body)
       const { user, data } = await validateSocketRequest(socket, contents, {
@@ -22,9 +24,9 @@ export const generateSocketEventHandler = <Req>
       await task(data)
     }
     catch (e) {
-      console.log(e)
       let errorBody = e
       if (Object.keys(e).length === 0) errorBody = Errors.internalServerError
+      if (e.errorCode == 500 || !e.errorCode) Logging.error(validation.inputClass?.name ?? 'Endpoint', e)
       socket.to(socket.id).error(errorBody)
     }
   })

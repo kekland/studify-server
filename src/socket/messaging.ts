@@ -7,11 +7,13 @@ import { MessagingMethods } from '../methods/messaging/messaging'
 import { Errors } from '../validation/errors'
 import { UserMethods } from '../methods/user/user'
 import { User } from '../entities/user'
+import { Logging } from '../logging/logging'
 
 export class MessagingSocket {
   static async initialize(server: Server) {
     server.on('connection', async (socket) => {
       const userAuthCheck = await checkSocketAuthentication(socket)
+      Logging.verbose('MessagingSocket', `Connection from ${socket.handshake.address} with id ${socket.id}`)
 
       if (!userAuthCheck) {
         socket.disconnect()
@@ -19,6 +21,8 @@ export class MessagingSocket {
       }
 
       let user = userAuthCheck
+
+      Logging.verbose('MessagingSocket', `${socket.id} authenticated, user is: {${user.id}, ${user.username}}`)
 
       const socketJoinRooms = () => {
         socket.leaveAll();
@@ -32,7 +36,6 @@ export class MessagingSocket {
       generateSocketEventHandler<SendMessageData>('sendMessage', socket, async (data) => {
         const response = await MessagingMethods.sendMessage(user, data)
 
-        console.log(data)
         socket.broadcast.to(data.groupId).emit('onNewGroupMessage', SendMessageResponse.transform(response))
 
         if (data.idempotencyId) {

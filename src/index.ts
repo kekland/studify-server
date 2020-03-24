@@ -23,7 +23,7 @@ const bootstrap = async () => {
   })
 
   expressServer.use((req, res, next) => {
-    console.log(req.ip, req.url, req.params, req.body)
+    Logging.verbose('Express', `Connection from ${req.ip} for ${req.url}`)
     next()
   })
 
@@ -44,7 +44,7 @@ const bootstrap = async () => {
 
   Logging.info('Bootstrap', `Starting Express on port ${port}`)
   expressServer.listen(port)
-  
+
   Logging.info('Bootstrap', `Starting Socket.io on port ${socketPort}`)
   socketServer.listen(socketPort)
 }

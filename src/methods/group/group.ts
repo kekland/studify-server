@@ -26,7 +26,6 @@ export class GroupMethods {
   }
 
   static getGroups: UnauthorizedMethod<GroupGetAllData, GroupGetMultipleResponse> = async (data) => {
-    console.log(data)
     const groups = await GroupMethods.getAllGroups()
     return new GroupGetMultipleResponse(groups)
   }

@@ -52,10 +52,8 @@ export const validateRequest = async <T>(req: Request, settings: IValidationSett
     let data: T = (req.body as T)
     // Transform the body
     if (inputClass) {
-      console.log(req.body, req.query)
       const body = { ...req.body, ...req.query }
       data = plainToClass(inputClass, body)
-      console.log(data)
     }
 
     // Validate the body

@@ -4,6 +4,7 @@ import { User } from "../entities/user";
 import { Errors } from "../validation/errors";
 import { classToPlain } from "class-transformer";
 import { AuthorizedMethod, UnauthorizedMethod, ParamsType } from "../methods/utils";
+import { Logging } from "../logging/logging";
 
 export type Transformer<Res> = (data: NonNullable<Res>) => any
 export const defaultTransformer = (data: any) => data
@@ -11,7 +12,10 @@ export const defaultTransformer = (data: any) => data
 export const generateEndpoint = <Req, Res>(task: (user: User | undefined, data: Req, params: ParamsType) => Promise<Res>, validation: IValidationSettings<Req>, transformer: Transformer<Res> = defaultTransformer) => {
   return async (req: Request, res: Response) => {
     try {
+      Logging.verbose(validation.inputClass?.name ?? 'Endpoint', `${req.ip} at endpoint`)
       const { user, data } = await validateRequest(req, validation)
+
+      Logging.verbose(validation.inputClass?.name ?? 'Endpoint', `${req.ip} is {${user?.id}, ${user?.username}}`)
       const responseBody = await task(user, data, req.params)
       if (responseBody) {
         res.send(classToPlain(transformer(responseBody as NonNullable<Res>)))
@@ -21,9 +25,9 @@ export const generateEndpoint = <Req, Res>(task: (user: User | undefined, data: 
       }
     }
     catch (e) {
-      console.log(e)
       let errorBody = e
       if (Object.keys(e).length === 0) errorBody = Errors.internalServerError
+      if (e.errorCode == 500 || !e.errorCode) Logging.error(validation.inputClass?.name ?? 'Endpoint', e)
       res.status(e.errorCode ?? 500).send(errorBody)
     }
   }
