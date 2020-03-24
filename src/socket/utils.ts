@@ -5,9 +5,9 @@ import { defaultTransformer, Transformer } from '../router/utils'
 import { classToPlain } from 'class-transformer'
 import { Errors } from '../validation/errors'
 
-export const generateSocketEventHandler = <Req, Res>
+export const generateSocketEventHandler = <Req>
   (event: string, socket: Socket,
-    task: (data: Req) => Promise<Res>,
+    task: (data: Req) => Promise<void>,
     validation: IValidationSettings<Req>) => {
   socket.on(event, async (body) => {
     try {

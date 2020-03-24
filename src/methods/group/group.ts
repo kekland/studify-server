@@ -3,6 +3,7 @@ import { UnauthorizedMethod, AuthorizedMethod } from "../utils";
 import { Group } from "../../entities/group";
 import { Errors } from "../../validation/errors";
 import { PaginatedData } from "../messaging/_data";
+import { User } from "../../entities/user";
 
 export class GroupMethods {
   static async getGroupById(id: string): Promise<Group | undefined> {
@@ -37,20 +38,17 @@ export class GroupMethods {
     const group = await GroupMethods.getGroupById(groupId)
     if (!group) throw Errors.invalidRequest
 
-    if (user.hasGroup(group)) throw Errors.invalidRequest
-    
-    const users = await Group
-      .createQueryBuilder('group')
+    if (!user.hasGroup(group)) throw Errors.invalidRequest
+
+    const users = await User
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.groups', 'group')
       .where('group.id=:groupId', { groupId })
-      .leftJoinAndSelect('group.users', 'user')
-      .select('group.users')
       .take(data.limit)
       .skip(data.skip)
       .getMany()
 
-    console.log(users)
-
-    return new GroupGetUsersResponse([])
+    return new GroupGetUsersResponse(users)
   }
 
   static joinGroup: AuthorizedMethod<GroupJoinData, GroupJoinResponse> = async (user, data, params) => {
@@ -79,6 +77,7 @@ export class GroupMethods {
     if (!group) throw Errors.invalidRequest
 
     if (!user.hasGroup(group)) throw Errors.invalidRequest
+    if (group.creator.id === user.id) throw Errors.invalidRequest
 
     user.groups.splice(user.groups.findIndex(g => g.id === groupId), 1)
     await user.save()

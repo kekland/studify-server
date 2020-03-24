@@ -62,3 +62,11 @@ export class GetMessagesResponse {
     }
   }
 }
+
+export class UpdateTypingStatusData {
+  @IsNotEmpty()
+  room!: string;
+  
+  @IsNotEmpty()
+  status!: boolean;
+}

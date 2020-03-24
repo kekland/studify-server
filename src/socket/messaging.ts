@@ -2,7 +2,7 @@ import { Socket, Server } from 'socket.io'
 import { GroupMethods } from '../methods/group/group'
 import { Group } from '../entities/group'
 import { generateSocketEventHandler, checkSocketAuthentication } from './utils'
-import { SendMessageData, SendMessageResponse } from '../methods/messaging/_data'
+import { SendMessageData, SendMessageResponse, UpdateTypingStatusData } from '../methods/messaging/_data'
 import { MessagingMethods } from '../methods/messaging/messaging'
 import { Errors } from '../validation/errors'
 import { UserMethods } from '../methods/user/user'
@@ -29,19 +29,22 @@ export class MessagingSocket {
       socketJoinRooms()
       server.to(socket.id).emit('authorization', { success: true })
 
-      generateSocketEventHandler<SendMessageData, SendMessageResponse>('messageSend', socket, async (data) => {
+      generateSocketEventHandler<SendMessageData>('sendMessage', socket, async (data) => {
         const response = await MessagingMethods.sendMessage(user, data)
 
-        socket.broadcast.to(data.groupId).emit('newGroupMessage', SendMessageResponse.transform(response))
+        console.log(data)
+        socket.broadcast.to(data.groupId).emit('onNewGroupMessage', SendMessageResponse.transform(response))
 
         if (data.idempotencyId) {
-          server.to(socket.id).emit('messageSent', SendMessageResponse.transform(response, data.idempotencyId))
+          server.to(socket.id).emit('onMessageSent', SendMessageResponse.transform(response, data.idempotencyId))
         }
-
-        return response
       }, { inputClass: SendMessageData, validateBody: true })
 
-      socket.on('updateRooms', async (room: string) => {
+      generateSocketEventHandler<UpdateTypingStatusData>('updateTypingStatus', socket, async (data) => {
+        socket.broadcast.to(data.room).emit('onUserTypingStatusUpdated', { user: User.transformMinimal(user), status: data.status })
+      }, { inputClass: UpdateTypingStatusData, validateBody: true })
+
+      socket.on('updateRooms', async () => {
         try {
           user = await UserMethods.findUser({ id: user.id }, true) as User
           socketJoinRooms()

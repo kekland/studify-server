@@ -52,9 +52,9 @@ export const groupRouter: () => Router = () => {
   const router = Router()
 
   router.get('/all', getAllGroups)
-  router.get('/:groupId', getGroup)
   router.get('/:groupId/users', getUsers)
   router.get('/:groupId/messages', getMessages)
+  router.get('/:groupId', getGroup)
   router.post('/create', createGroup)
   router.post('/:groupId/join', joinGroup)
   router.post('/:groupId/leave', leaveGroup)
