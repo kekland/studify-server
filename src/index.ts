@@ -8,6 +8,7 @@ import { groupRouter } from "./router/group"
 import socketio from 'socket.io'
 import { MessagingSocket } from "./socket/messaging"
 import { Logging } from "./logging/logging";
+import cors from 'cors'
 
 const bootstrap = async () => {
   Logging.info('Bootstrap', 'Starting server')
@@ -16,6 +17,8 @@ const bootstrap = async () => {
 
   // Load Express
   const expressServer = express()
+  
+  expressServer.use(cors())
   expressServer.use(bodyParser())
 
   expressServer.use((req, res, next) => {
