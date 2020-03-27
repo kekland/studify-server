@@ -5,6 +5,7 @@ export interface IGroup {
   name: string;
   description?: string;
   colorId: number;
+  icon: string;
   creator: User;
 }
 
@@ -21,6 +22,9 @@ export class Group extends BaseEntity {
 
   @Column()
   colorId!: number;
+  
+  @Column()
+  icon!: string;
 
   @Column()
   userCount!: number; 
@@ -43,6 +47,7 @@ export class Group extends BaseEntity {
       this.name = data.name
       this.description = data.description
       this.colorId = data.colorId
+      this.icon = data.icon
       this.creator = data.creator
       this.userCount = 1;
     }
@@ -54,6 +59,7 @@ export class Group extends BaseEntity {
       name: data.name,
       description: data.description,
       colorId: data.colorId,
+      icon: data.icon,
       userCount: data.userCount,
       creator: User.transformMinimal(data.creator),
       created: data.created,
@@ -68,6 +74,7 @@ export class Group extends BaseEntity {
       userCount: data.userCount,
       description: data.description,
       colorId: data.colorId,
+      icon: data.icon,
     }
   }
 }

@@ -1,4 +1,4 @@
-import { MinLength, IsNotEmpty, IsNumber } from "class-validator";
+import { MinLength, IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { Group } from "../../entities/group";
 import { Message } from "../../entities/message";
 import { User } from "../../entities/user";
@@ -12,6 +12,9 @@ export class GroupCreateData {
 
   @IsNumber()
   colorId!: number;
+
+  @IsString()
+  icon!: string;
 }
 
 export class GroupUpdateData {
@@ -23,6 +26,9 @@ export class GroupUpdateData {
 
   @IsNumber()
   colorId!: number;
+  
+  @IsString()
+  icon!: string;
 }
 
 export class GroupGetData {

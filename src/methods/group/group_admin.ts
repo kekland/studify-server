@@ -10,7 +10,8 @@ export class GroupAdminMethods {
       name: data.name,
       description: data.description,
       colorId: data.colorId,
-      creator: user
+      creator: user,
+      icon: data.icon,
     })
 
     await group.save()
@@ -33,6 +34,7 @@ export class GroupAdminMethods {
     group.name = data.name
     group.description = data.description
     group.colorId = data.colorId
+    group.icon = data.icon
 
     await group.save()
     return group
