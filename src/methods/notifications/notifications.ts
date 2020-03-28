@@ -12,27 +12,21 @@ export class NotificationMethods {
     return notification
   }
 
-  static getNotifications = async (user: User, data: { skip: number, limit?: number, type?: NotificationType, from?: Date }) => {
-    const skip = data.skip
-    const take = data.limit ?? 20
-
+  static getNotifications = async (user: User, data: { skip?: number, limit?: number, type?: NotificationType, from?: Date }) => {
     const type = data.type
     const from = data.from
 
     let query = Notification.createQueryBuilder('notification')
       .orderBy('notification.created', 'DESC')
-      .where('notification.created > :from', { from })
+      .where('notification.userId = :userId', { userId: user.id })
 
-    if (from) {
-      query = query.where('notification.created > :from', { from })
-    }
-
-    if (type) {
-      query = query.andWhere('notification.type = :type', { type })
-    }
+    if (from) query = query.where('notification.created > :from', { from })
+    if (type) query = query.andWhere('notification.type = :type', { type })
+    if (data.skip) query = query.skip(data.skip)
+    if (data.limit) query = query.take(data.limit)
 
 
-    const results = query.skip(skip).take(take).getMany()
+    const results = query.getMany()
     return results
   }
 
@@ -44,6 +38,7 @@ export class NotificationMethods {
 
     let query = Notification.createQueryBuilder('notification')
       .orderBy('notification.created', 'DESC')
+      .where('notification.userId = :userId', { userId: user.id })
 
     if (unreadOnly) {
       query = query.where('notification.read = :read', { read: false })
@@ -71,6 +66,7 @@ export class NotificationMethods {
       .where('notification.read = :read', { read: false })
       .andWhere('notification.userId = :userId', { userId: user.id })
       .andWhere('notification.id IN (:...ids)', { ids: data.notifications })
+      .execute()
 
     return {}
   }
