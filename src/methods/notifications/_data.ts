@@ -1,6 +1,8 @@
 import { PaginatedData } from "../messaging/_data";
+import { IsArray, IsString } from "class-validator";
 
-export class GetNotificationsData extends PaginatedData {
-  from: Date;
-  
+export class SetNotificationsAsReadData {
+  @IsArray()
+  @IsString({each: true})
+  notifications!: string[]
 }

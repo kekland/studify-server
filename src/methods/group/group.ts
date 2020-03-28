@@ -6,6 +6,7 @@ import { PaginatedData } from "../messaging/_data";
 import { User } from "../../entities/user";
 import { MessagingMethods } from "../messaging/messaging";
 import { NotificationMethods } from "../notifications/notifications";
+import { INotification, INotificationBody } from "../../entities/notification";
 
 export class GroupMethods {
   static async getGroupById(id: string): Promise<Group | undefined> {
@@ -32,6 +33,18 @@ export class GroupMethods {
     return new GroupGetMultipleResponse(groups)
   }
 
+  static _getGroupUsers = async (groupId: string, data: { limit?: number, skip?: number }): Promise<User[]> => {
+    let query = User
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.groups', 'group')
+      .where('group.id=:groupId', { groupId })
+
+    if (data.limit) query = query.take(data.limit)
+    if (data.skip) query = query.skip(data.skip)
+
+    return query.getMany()
+  }
+
   static getGroupUsers: AuthorizedMethod<PaginatedData, GroupGetUsersResponse> = async (user, data, params) => {
     const groupId = params?.groupId
     if (!groupId) throw Errors.invalidRequest
@@ -41,14 +54,7 @@ export class GroupMethods {
 
     if (!user.hasGroup(group)) throw Errors.invalidRequest
 
-    const users = await User
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.groups', 'group')
-      .where('group.id=:groupId', { groupId })
-      .take(data.limit)
-      .skip(data.skip)
-      .getMany()
-
+    const users = await GroupMethods._getGroupUsers(group.id, data)
     return new GroupGetUsersResponse(users)
   }
 
@@ -89,6 +95,23 @@ export class GroupMethods {
     return new GroupJoinResponse(group);
   }
 
+  static notifyAllGroupUsers = async (group: Group, notificationData: INotificationBody) => {
+    const users = await GroupMethods._getGroupUsers(group.id, {})
+
+    for (const user of users) {
+      await NotificationMethods.pushNotification({ userId: user.id, ...notificationData })
+    }
+  }
+
+  static _loadData = async (user: User, group: Group) => {
+    const groupId = group.id
+
+    const lastMessages = await MessagingMethods.getMessages(user, { limit: 20, skip: 0 }, { groupId })
+    const unreadMessages = await NotificationMethods.getNotificationCount(user, { groupId, type: 'onMessage' })
+
+    return new GroupLoadDataResponse(group, lastMessages.messages, unreadMessages, undefined)
+  }
+
   static loadData: AuthorizedMethod<NoRequestData, GroupLoadDataResponse> = async (user, data, params) => {
     const groupId = params?.groupId
     if (!groupId) throw Errors.invalidRequest
@@ -97,15 +120,11 @@ export class GroupMethods {
 
     if (!group) throw Errors.invalidRequest
 
-    const lastMessages = await MessagingMethods.getMessages(user, { limit: 20, skip: 0 }, { groupId })
-
-    const unreadMessages = await NotificationMethods.getNotificationCount(user, { groupId, type: 'onMessage' })
-
-    return new GroupLoadDataResponse(group, lastMessages.messages, unreadMessages, undefined)
+    return GroupMethods._loadData(user, group)
   }
 
   static loadAllData: AuthorizedMethod<NoRequestData, GroupLoadAllDataResponse> = async (user, data, params) => {
-    const response = await Promise.all(user.groups.map((group) => GroupMethods.loadData(user, {}, { groupId: group.id })))
+    const response = await Promise.all(user.groups.map((group) => GroupMethods._loadData(user, group)))
 
     return new GroupLoadAllDataResponse(response)
   }

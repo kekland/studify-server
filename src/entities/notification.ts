@@ -4,6 +4,12 @@ import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn, BaseEntity, Primar
 
 export type NotificationType = 'onMessage'
 
+export interface INotificationBody {
+  type: NotificationType;
+  message: string;
+  groupId?: string;
+}
+
 export interface INotification {
   userId: string;
   type: NotificationType;

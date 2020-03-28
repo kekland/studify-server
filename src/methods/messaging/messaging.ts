@@ -20,6 +20,8 @@ export class MessagingMethods {
 
     await message.save()
 
+    await GroupMethods.notifyAllGroupUsers(group, { groupId: group.id, message: message.body, type: 'onMessage', })
+
     return new SendMessageResponse(message)
   }
 
