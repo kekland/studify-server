@@ -44,7 +44,7 @@ export class MessagingSocket {
       }, { inputClass: SendMessageData, validateBody: true })
 
       generateSocketEventHandler<UpdateTypingStatusData>('updateTypingStatus', socket, async (data) => {
-        socket.broadcast.to(data.room).emit('onUserTypingStatusUpdated', { user: User.transformMinimal(user), status: data.status })
+        socket.broadcast.to(data.room).emit('onUserTypingStatusUpdated', { user: User.transformMinimal(user), status: data.status, groupId: data.room })
       }, { inputClass: UpdateTypingStatusData, validateBody: true })
 
       socket.on('updateRooms', async () => {

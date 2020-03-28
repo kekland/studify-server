@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { configuration } from "./config"
+import { configuration } from "./config-heroku"
 import { authRouter } from "./router/auth"
 import express, { Router } from 'express'
 import bodyParser from 'body-parser'
