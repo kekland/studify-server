@@ -8,6 +8,7 @@ import { UnauthorizedMethod, AuthorizedMethod, NoRequestData } from "../utils";
 import { SignInData, SignInResponse, SignUpData, SignUpResponse, SignInWithTokenResponse } from "./_data";
 import { UserMethods } from "../user/user";
 import { config } from "../..";
+import { NotificationMethods } from "../notifications/notifications";
 
 export class AuthMethods {
   static signIn: UnauthorizedMethod<SignInData, SignInResponse> = async (credentials) => {
@@ -23,7 +24,8 @@ export class AuthMethods {
       user.lastSignInTime = new Date()
       await user.save()
 
-      return new SignInResponse(token, user)
+      const notifications = await NotificationMethods.getNotifications(user, { unreadOnly: true })
+      return new SignInResponse(token, user, notifications)
     }
     else {
       throw Errors.invalidCredentials
@@ -57,7 +59,9 @@ export class AuthMethods {
   static signInWithToken: AuthorizedMethod<NoRequestData, SignInWithTokenResponse> = async (user) => {
     user.lastSignInTime = new Date()
     await user.save()
-    
-    return new SignInWithTokenResponse(user)
+
+    const notifications = await NotificationMethods.getNotifications(user, { unreadOnly: true })
+
+    return new SignInWithTokenResponse(user, notifications)
   }
 }

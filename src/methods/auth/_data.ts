@@ -1,5 +1,6 @@
 import { User } from "../../entities/user";
 import { IsNotEmpty, IsEmail, MinLength } from "class-validator";
+import { Notification } from '../../entities/notification'
 
 export class SignInData {
   @IsNotEmpty()
@@ -17,16 +18,19 @@ export class SignInData {
 export class SignInResponse {
   token: string;
   user: User;
+  notifications: Notification[];
 
-  constructor(token: string, user: User) {
+  constructor(token: string, user: User, notifications: Notification[]) {
     this.token = token
-    this.user = user
+    this.user = user,
+    this.notifications = notifications
   }
 
   static transform(data: SignInResponse) {
     return {
       token: data.token,
       user: User.transformOwner(data.user),
+      notifications: data.notifications.map((notification) => Notification.transform(notification)),
     }
   }
 }
@@ -64,14 +68,17 @@ export class SignUpResponse {
 
 export class SignInWithTokenResponse {
   user: User;
+  notifications: Notification[];
 
-  constructor(user: User) {
+  constructor(user: User, notifications: Notification[]) {
     this.user = user
+    this.notifications = notifications
   }
 
   static transform(data: SignInWithTokenResponse) {
     return {
-      uesr: User.transformOwner(data.user)
+      user: User.transformOwner(data.user),
+      notifications: data.notifications.map((notification) => Notification.transform(notification)),
     }
   }
 }

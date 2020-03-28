@@ -12,14 +12,16 @@ export class NotificationMethods {
     return notification
   }
 
-  static getNotifications = async (user: User, data: { skip?: number, limit?: number, type?: NotificationType, from?: Date }) => {
+  static getNotifications = async (user: User, data: { unreadOnly?: boolean, skip?: number, limit?: number, type?: NotificationType, from?: Date }) => {
     const type = data.type
     const from = data.from
+    const unreadOnly = data.unreadOnly ?? true
 
     let query = Notification.createQueryBuilder('notification')
       .orderBy('notification.created', 'DESC')
       .where('notification.userId = :userId', { userId: user.id })
 
+    if (unreadOnly) query = query.where('notification.read = :read', { read: false })
     if (from) query = query.where('notification.created > :from', { from })
     if (type) query = query.andWhere('notification.type = :type', { type })
     if (data.skip) query = query.skip(data.skip)
