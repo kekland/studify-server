@@ -10,7 +10,10 @@ import { User } from '../entities/user'
 import { Logging } from '../logging/logging'
 
 export class MessagingSocket {
+  static server: Server;
+
   static async initialize(server: Server) {
+    this.server = server
     server.on('connection', async (socket) => {
       const userAuthCheck = await checkSocketAuthentication(socket)
       Logging.verbose('MessagingSocket', `Connection from ${socket.handshake.address} with id ${socket.id}`)
@@ -57,5 +60,9 @@ export class MessagingSocket {
         }
       })
     })
+  }
+
+  static async onGroupChange(group: Group) {
+    this.server.to(group.id).emit('onGroupChange', Group.transformMinimal(group))
   }
 }
