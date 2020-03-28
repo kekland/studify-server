@@ -124,7 +124,7 @@ export class GroupLoadDataResponse {
 
   static transform(data: GroupLoadDataResponse) {
     return {
-      group: data.group,
+      group: Group.transform(data.group),
       lastMessages: data.lastMessages.map((message) => Message.transformSocket(message)),
       unreadMessages: data.unreadMessages,
       mutedUntil: data.mutedUntil

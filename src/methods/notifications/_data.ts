@@ -6,3 +6,8 @@ export class SetNotificationsAsReadData {
   @IsString({each: true})
   notifications!: string[]
 }
+
+export class SetGroupAsReadData {
+  @IsString()
+  groupId!: string;
+}

@@ -8,6 +8,8 @@ import { PaginatedData, GetMessagesResponse } from '../methods/messaging/_data'
 import { MessagingMethods } from '../methods/messaging/messaging'
 import { ClassType } from "class-transformer/ClassTransformer";
 import { NoRequestData } from '../methods/utils'
+import { NotificationMethods } from '../methods/notifications/notifications'
+import { SetGroupAsReadData } from '../methods/notifications/_data'
 
 const getGroup = generateUnauthorizedMethodEndpoint(GroupMethods.getGroup, {
   inputClass: GroupGetData,
@@ -59,6 +61,11 @@ const loadAllData = generateAuthorizedMethodEndpoint(GroupMethods.loadAllData, {
   populateUser: true
 }, GroupLoadAllDataResponse.transform)
 
+const setGroupAsRead = generateAuthorizedMethodEndpoint(NotificationMethods.setGroupAsRead, {
+  inputClass: SetGroupAsReadData,
+  validateBody: true,
+})
+
 export const groupRouter: () => Router = () => {
   const router = Router()
 
@@ -71,6 +78,7 @@ export const groupRouter: () => Router = () => {
   router.post('/create', createGroup)
   router.post('/:groupId/join', joinGroup)
   router.post('/:groupId/leave', leaveGroup)
+  router.post('/:groupId/setAsRead', setGroupAsRead)
   router.put('/:groupId/update', updateGroup)
 
   return router

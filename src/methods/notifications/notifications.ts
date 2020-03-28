@@ -1,8 +1,9 @@
 import { User } from "../../entities/user";
 import { INotification, Notification, NotificationType } from "../../entities/notification";
-import { AuthorizedMethod, NoRequestResponse } from "../utils";
+import { AuthorizedMethod, NoRequestResponse, NoRequestData } from "../utils";
 import { MoreThan } from "typeorm";
-import { SetNotificationsAsReadData } from "./_data";
+import { SetNotificationsAsReadData, SetGroupAsReadData } from "./_data";
+import { Errors } from "../../validation/errors";
 
 export class NotificationMethods {
   static pushNotification = async (notificationData: INotification) => {
@@ -68,6 +69,20 @@ export class NotificationMethods {
       .where('notification.read = :read', { read: false })
       .andWhere('notification.userId = :userId', { userId: user.id })
       .andWhere('notification.id IN (:...ids)', { ids: data.notifications })
+      .execute()
+
+    return {}
+  }
+
+  static setGroupAsRead: AuthorizedMethod<SetGroupAsReadData, NoRequestResponse> = async (user, data, params) => {
+    if (!params?.groupId) throw Errors.invalidRequest
+  
+    await Notification.createQueryBuilder('notification')
+      .update()
+      .set({ read: true })
+      .where('notification.read = :read', { read: false })
+      .andWhere('notification.userId = :userId', { userId: user.id })
+      .andWhere('notification.groupId = :groupId', { groupId: params.groupId })
       .execute()
 
     return {}
