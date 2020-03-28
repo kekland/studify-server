@@ -4,8 +4,8 @@ import { sign } from 'jsonwebtoken'
 import { Errors } from "../../validation/errors";
 import { User } from "../../entities/user";
 import { PermissionLevels } from "../../validation/permissions";
-import { UnauthorizedMethod } from "../utils";
-import { SignInData, SignInResponse, SignUpData, SignUpResponse } from "./_data";
+import { UnauthorizedMethod, AuthorizedMethod, NoRequestData } from "../utils";
+import { SignInData, SignInResponse, SignUpData, SignUpResponse, SignInWithTokenResponse } from "./_data";
 import { UserMethods } from "../user/user";
 import { config } from "../..";
 
@@ -19,6 +19,10 @@ export class AuthMethods {
 
     if (matches) {
       const token = sign({ id: user.id }, config.jwt)
+
+      user.lastSignInTime = new Date()
+      await user.save()
+
       return new SignInResponse(token, user)
     }
     else {
@@ -48,5 +52,12 @@ export class AuthMethods {
     const { token } = await AuthMethods.signIn(new SignInData(data.username, data.password))
 
     return new SignUpResponse(token, user)
+  }
+
+  static signInWithToken: AuthorizedMethod<NoRequestData, SignInWithTokenResponse> = async (user) => {
+    user.lastSignInTime = new Date()
+    await user.save()
+    
+    return new SignInWithTokenResponse(user)
   }
 }

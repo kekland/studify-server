@@ -61,3 +61,17 @@ export class SignUpResponse {
     }
   }
 }
+
+export class SignInWithTokenResponse {
+  user: User;
+
+  constructor(user: User) {
+    this.user = user
+  }
+
+  static transform(data: SignInWithTokenResponse) {
+    return {
+      uesr: User.transformOwner(data.user)
+    }
+  }
+}

@@ -20,4 +20,8 @@ export class UserMethods {
 
     return user
   }
+  static getUserData = async (id: string): Promise<User | undefined> => {
+    const user = UserMethods.findUser({ id }, true)
+    return user
+  }
 }

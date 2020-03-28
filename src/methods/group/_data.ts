@@ -1,5 +1,5 @@
 import { MinLength, IsNotEmpty, IsNumber, IsString } from "class-validator";
-import { Group } from "../../entities/group";
+import { Group, IGroup } from "../../entities/group";
 import { Message } from "../../entities/message";
 import { User } from "../../entities/user";
 
@@ -26,7 +26,7 @@ export class GroupUpdateData {
 
   @IsNumber()
   colorId!: number;
-  
+
   @IsString()
   icon!: string;
 }
@@ -105,6 +105,43 @@ export class GroupGetUsersResponse {
   static transform(data: GroupGetUsersResponse) {
     return {
       users: data.users.map(user => User.transformMinimal(user))
+    }
+  }
+}
+
+export class GroupLoadDataResponse {
+  group: Group;
+  lastMessages: Message[];
+  unreadMessages: number;
+  mutedUntil?: Date;
+
+  constructor(group: Group, lastMessages: Message[], unreadMessages: number, mutedUntil?: Date) {
+    this.group = group
+    this.lastMessages = lastMessages
+    this.unreadMessages = unreadMessages
+    this.mutedUntil = mutedUntil
+  }
+
+  static transform(data: GroupLoadDataResponse) {
+    return {
+      group: data.group,
+      lastMessages: data.lastMessages.map((message) => Message.transformSocket(message)),
+      unreadMessages: data.unreadMessages,
+      mutedUntil: data.mutedUntil
+    }
+  }
+}
+
+export class GroupLoadAllDataResponse {
+  data: GroupLoadDataResponse[];
+
+  constructor(data: GroupLoadDataResponse[]) {
+    this.data = data
+  }
+
+  static transform(data: GroupLoadAllDataResponse) {
+    return {
+      data: data.data.map(response => GroupLoadDataResponse.transform(response))
     }
   }
 }

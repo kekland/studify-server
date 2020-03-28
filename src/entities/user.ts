@@ -50,6 +50,9 @@ export class User extends BaseEntity {
   @UpdateDateColumn()
   updated!: Date;
 
+  @Column()
+  lastSignInTime!: Date;
+
   constructor(data?: IUser) {
     super()
     if (data) {
@@ -60,6 +63,7 @@ export class User extends BaseEntity {
       this.groups = data.groups
       this.createdGroups = data.createdGroups
       this.permissionLevel = data.permissionLevel
+      this.lastSignInTime = new Date()
     }
   }
 
