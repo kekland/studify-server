@@ -4,7 +4,7 @@
   "description": "A server for studify-app built with TypeScript",
   "main": "build/index.js",
   "scripts": {
-    "build-ts": "tsc",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "node build/index.js",
     "start": "npm run serve"
