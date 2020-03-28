@@ -2,12 +2,12 @@ import { IsNotEmpty, MinLength, IsEmail } from "class-validator"
 import { compare, hash, genSaltSync } from 'bcrypt'
 import { sign } from 'jsonwebtoken'
 import { Errors } from "../../validation/errors";
-import { configuration } from "../../config-heroku";
 import { User } from "../../entities/user";
 import { PermissionLevels } from "../../validation/permissions";
 import { UnauthorizedMethod } from "../utils";
 import { SignInData, SignInResponse, SignUpData, SignUpResponse } from "./_data";
 import { UserMethods } from "../user/user";
+import { config } from "../..";
 
 export class AuthMethods {
   static signIn: UnauthorizedMethod<SignInData, SignInResponse> = async (credentials) => {
@@ -18,7 +18,7 @@ export class AuthMethods {
     const matches = await compare(credentials.password, user.hash)
 
     if (matches) {
-      const token = sign({ id: user.id }, configuration.jwt)
+      const token = sign({ id: user.id }, config.jwt)
       return new SignInResponse(token, user)
     }
     else {

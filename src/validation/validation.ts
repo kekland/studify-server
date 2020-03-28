@@ -1,7 +1,6 @@
 import { PermissionLevel } from "./permissions";
 import { Request } from 'express'
 import { verify } from 'jsonwebtoken'
-import { configuration } from "../config-heroku";
 import { Errors } from "./errors";
 import { User } from "../entities/user";
 import { plainToClass } from 'class-transformer'
@@ -10,6 +9,7 @@ import { ClassType } from "class-transformer/ClassTransformer";
 import { UserMethods } from "../methods/user/user";
 import { Socket } from "socket.io";
 import { SendMessageData } from "../methods/messaging/_data";
+import { config } from "..";
 
 export interface IValidationSettings<T> {
   permission?: PermissionLevel,
@@ -36,7 +36,7 @@ export const validateRequest = async <T>(req: Request, settings: IValidationSett
       if (!token || !token.startsWith('Bearer')) throw Errors.invalidAuthentication
       token = token.replace('Bearer ', '')
 
-      const payload: any = verify(token, configuration.jwt)
+      const payload: any = verify(token, config.jwt)
       if (typeof payload === 'string') throw Errors.invalidAuthentication
 
       const id = payload.id
@@ -94,7 +94,7 @@ export const validateSocketRequest = async <T>(socket: Socket, body: any, settin
       if (!token) throw Errors.invalidAuthentication
       token = token.replace('Bearer ', '')
 
-      const payload: any = verify(token, configuration.jwt)
+      const payload: any = verify(token, config.jwt)
       if (typeof payload === 'string') throw Errors.invalidAuthentication
 
       const id = payload.id

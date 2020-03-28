@@ -13,5 +13,5 @@ export const configuration = {
     synchronize: true,
   } as ConnectionOptions,
   jwt: process.env.jwt as string,
-  port: process.env.PORT,
+  port: process.env.PORT as string,
 }

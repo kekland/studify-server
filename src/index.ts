@@ -1,5 +1,6 @@
 import "reflect-metadata";
-import { configuration } from "./config-heroku"
+import * as Local from './config-local'
+import * as Heroku from "./config-heroku"
 import { authRouter } from "./router/auth"
 import express, { Router, static as serveStatic } from 'express'
 import bodyParser from 'body-parser'
@@ -11,10 +12,15 @@ import { Logging } from "./logging/logging";
 import cors from 'cors'
 import http from 'http'
 
+let isLocal = process.env.PORT == null
+let config = Local.configuration
+if (!isLocal)
+  config = Heroku.configuration
+
 const bootstrap = async () => {
   Logging.info('Bootstrap', 'Starting server')
   // Load configuration
-  const { port, options } = configuration
+  const { port, options } = config
 
   // Load server
   const expressServer = express()
@@ -23,9 +29,11 @@ const bootstrap = async () => {
   expressServer.use(cors())
   expressServer.use(bodyParser({ extended: true }))
 
-  // expressServer.use((req, res, next) => {
-  //   setTimeout(() => next(), 550);
-  // })
+  if (isLocal) {
+    expressServer.use((req, res, next) => {
+      setTimeout(() => next(), 550);
+    })
+  }
 
   expressServer.use((req, res, next) => {
     Logging.verbose('Express', `Connection from ${req.ip} for ${req.url}`)
@@ -57,5 +65,7 @@ const bootstrap = async () => {
 
   Logging.info('Bootstrap', `Starting Socket.io on port ${port}`)
 }
+
+export { config }
 
 bootstrap()
