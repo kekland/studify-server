@@ -7,6 +7,7 @@ import { User } from "../../entities/user";
 import { MessagingMethods } from "../messaging/messaging";
 import { NotificationMethods } from "../notifications/notifications";
 import { INotification, INotificationBody } from "../../entities/notification";
+import { MessagingSocket } from "../../socket/messaging";
 
 export class GroupMethods {
   static async getGroupById(id: string): Promise<Group | undefined> {
@@ -73,6 +74,8 @@ export class GroupMethods {
     group.userCount += 1
     await group.save()
 
+    await MessagingSocket.onGroupChange(group)
+
     return new GroupJoinResponse(group);
   }
 
@@ -92,6 +95,8 @@ export class GroupMethods {
     group.userCount -= 1
     await group.save()
 
+    await MessagingSocket.onGroupChange(group)
+    
     return new GroupJoinResponse(group);
   }
 

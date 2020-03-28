@@ -62,7 +62,7 @@ const loadAllData = generateAuthorizedMethodEndpoint(GroupMethods.loadAllData, {
 }, GroupLoadAllDataResponse.transform)
 
 const setGroupAsRead = generateAuthorizedMethodEndpoint(NotificationMethods.setGroupAsRead, {
-  inputClass: SetGroupAsReadData,
+  inputClass: NoRequestData,
   validateBody: true,
 })
 

@@ -74,7 +74,7 @@ export class NotificationMethods {
     return {}
   }
 
-  static setGroupAsRead: AuthorizedMethod<SetGroupAsReadData, NoRequestResponse> = async (user, data, params) => {
+  static setGroupAsRead: AuthorizedMethod<NoRequestData, NoRequestResponse> = async (user, data, params) => {
     if (!params?.groupId) throw Errors.invalidRequest
   
     await Notification.createQueryBuilder('notification')

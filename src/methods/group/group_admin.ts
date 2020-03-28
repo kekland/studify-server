@@ -3,6 +3,7 @@ import { Group } from "../../entities/group";
 import { Errors } from "../../validation/errors";
 import { GroupCreateData, GroupUpdateData } from "./_data";
 import { GroupMethods } from "./group";
+import { MessagingSocket } from "../../socket/messaging";
 
 export class GroupAdminMethods {
   static createGroup: AuthorizedMethod<GroupCreateData, Group> = async (user, data) => {
@@ -37,6 +38,9 @@ export class GroupAdminMethods {
     group.icon = data.icon
 
     await group.save()
+
+    await MessagingSocket.onGroupChange(group)
+
     return group
   }
 }
