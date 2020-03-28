@@ -2,7 +2,7 @@ import { IsNotEmpty, MinLength, IsEmail } from "class-validator"
 import { compare, hash, genSaltSync } from 'bcrypt'
 import { sign } from 'jsonwebtoken'
 import { Errors } from "../../validation/errors";
-import { configuration } from "../../config";
+import { configuration } from "../../config-heroku";
 import { User } from "../../entities/user";
 import { PermissionLevels } from "../../validation/permissions";
 import { UnauthorizedMethod } from "../utils";

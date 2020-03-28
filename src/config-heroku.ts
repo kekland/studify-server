@@ -12,7 +12,7 @@ export const configuration = {
     entities: [Group, Message, User],
     synchronize: true,
   } as ConnectionOptions,
-  jwt: process.env.jwt,
+  jwt: process.env.jwt as string,
   port: 8080,
   socketPort: 5005,
 }

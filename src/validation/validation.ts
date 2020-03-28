@@ -1,7 +1,7 @@
 import { PermissionLevel } from "./permissions";
 import { Request } from 'express'
 import { verify } from 'jsonwebtoken'
-import { configuration } from "../config";
+import { configuration } from "../config-heroku";
 import { Errors } from "./errors";
 import { User } from "../entities/user";
 import { plainToClass } from 'class-transformer'
