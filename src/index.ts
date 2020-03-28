@@ -13,7 +13,7 @@ import cors from 'cors'
 const bootstrap = async () => {
   Logging.info('Bootstrap', 'Starting server')
   // Load configuration
-  const { port, socketPort, options } = configuration
+  const { port, options } = configuration
 
   // Load Express
   const expressServer = express()
@@ -31,7 +31,7 @@ const bootstrap = async () => {
   })
 
   // Load Socket.io
-  const socketServer = socketio()
+  const socketServer = socketio(expressServer)
   MessagingSocket.initialize(socketServer)
 
   // Connect to mongo
@@ -48,8 +48,7 @@ const bootstrap = async () => {
   Logging.info('Bootstrap', `Starting Express on port ${port}`)
   expressServer.listen(port)
 
-  Logging.info('Bootstrap', `Starting Socket.io on port ${socketPort}`)
-  socketServer.listen(socketPort)
+  Logging.info('Bootstrap', `Starting Socket.io on port ${port}`)
 }
 
 bootstrap()

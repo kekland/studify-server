@@ -13,6 +13,5 @@ export const configuration = {
     synchronize: true,
   } as ConnectionOptions,
   jwt: process.env.jwt as string,
-  port: 8080,
-  socketPort: 5005,
+  port: process.env.PORT,
 }
