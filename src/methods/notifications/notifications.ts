@@ -41,7 +41,7 @@ export class NotificationMethods {
 
     let query = Notification.createQueryBuilder('notification')
       .orderBy('notification.created', 'DESC')
-      .where('notification.userId = :userId', { userId: user.id })
+      .where('notification."userId" = :userId', { userId: user.id })
 
     if (unreadOnly) {
       query = query.where('notification.read = :read', { read: false })
@@ -55,7 +55,7 @@ export class NotificationMethods {
       query = query.andWhere('notification.type = :type', { type })
     }
     if (groupId) {
-      query = query.andWhere('notification.groupId = :groupId', { groupId })
+      query = query.andWhere('notification."groupId" = :groupId', { groupId })
     }
 
     const results = query.getCount()
@@ -67,7 +67,7 @@ export class NotificationMethods {
       .update()
       .set({ read: true })
       .where('notification.read = :read', { read: false })
-      .andWhere('notification.userId = :userId', { userId: user.id })
+      .andWhere('notification."userId" = :userId', { userId: user.id })
       .andWhere('notification.id IN (:...ids)', { ids: data.notifications })
       .execute()
 
@@ -81,8 +81,8 @@ export class NotificationMethods {
       .update()
       .set({ read: true })
       .where('notification.read = :read', { read: false })
-      .andWhere('notification.userId = :userId', { userId: user.id })
-      .andWhere('notification.groupId = :groupId', { groupId: params.groupId })
+      .andWhere('notification."userId" = :userId', { userId: user.id })
+      .andWhere('notification."groupId" = :groupId', { groupId: params.groupId })
       .execute()
 
     return {}
