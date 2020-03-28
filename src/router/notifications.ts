@@ -12,7 +12,7 @@ const setNotificationsAsRead =
     inputClass: SetNotificationsAsReadData,
   })
 
-export const authRouter: () => Router = () => {
+export const notificationsRouter: () => Router = () => {
   const router = Router()
 
   router.post('/setRead', setNotificationsAsRead)
