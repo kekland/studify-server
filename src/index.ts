@@ -23,9 +23,9 @@ const bootstrap = async () => {
   expressServer.use(cors())
   expressServer.use(bodyParser({ extended: true }))
 
-  expressServer.use((req, res, next) => {
-    setTimeout(() => next(), 550);
-  })
+  // expressServer.use((req, res, next) => {
+  //   setTimeout(() => next(), 550);
+  // })
 
   expressServer.use((req, res, next) => {
     Logging.verbose('Express', `Connection from ${req.ip} for ${req.url}`)
