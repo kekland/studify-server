@@ -17,9 +17,9 @@ const bootstrap = async () => {
 
   // Load Express
   const expressServer = express()
-  
+
   expressServer.use(cors())
-  expressServer.use(bodyParser())
+  expressServer.use(bodyParser({ extended: true }))
 
   expressServer.use((req, res, next) => {
     setTimeout(() => next(), 550);
