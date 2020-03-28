@@ -9,14 +9,16 @@ import socketio from 'socket.io'
 import { MessagingSocket } from "./socket/messaging"
 import { Logging } from "./logging/logging";
 import cors from 'cors'
+import http from 'http'
 
 const bootstrap = async () => {
   Logging.info('Bootstrap', 'Starting server')
   // Load configuration
   const { port, options } = configuration
 
-  // Load Express
+  // Load server
   const expressServer = express()
+  const server = http.createServer(expressServer)
 
   expressServer.use(cors())
   expressServer.use(bodyParser({ extended: true }))
@@ -31,7 +33,7 @@ const bootstrap = async () => {
   })
 
   // Load Socket.io
-  const socketServer = socketio(expressServer)
+  const socketServer = socketio(server)
   MessagingSocket.initialize(socketServer)
 
   // Connect to mongo
@@ -46,7 +48,7 @@ const bootstrap = async () => {
   Object.keys(routers).forEach(key => expressServer.use(key, routers[key]))
 
   Logging.info('Bootstrap', `Starting Express on port ${port}`)
-  expressServer.listen(port)
+  server.listen(port)
 
   Logging.info('Bootstrap', `Starting Socket.io on port ${port}`)
 }
