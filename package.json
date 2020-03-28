@@ -4,7 +4,9 @@
   "description": "A server for studify-app built with TypeScript",
   "main": "build/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "npm run load-client && npm run build-client && tsc",
+    "load-client": "git clone https://github.com/kekland/studify-web-app client",
+    "build-client": "cd client && npm install && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "node build/index.js",
     "start": "npm run serve"

@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { configuration } from "./config-heroku"
 import { authRouter } from "./router/auth"
-import express, { Router } from 'express'
+import express, { Router, static as serveStatic } from 'express'
 import bodyParser from 'body-parser'
 import { createConnection } from 'typeorm'
 import { groupRouter } from "./router/group"
@@ -46,6 +46,11 @@ const bootstrap = async () => {
   }
 
   Object.keys(routers).forEach(key => expressServer.use(key, routers[key]))
+
+  // Setup client serving
+  expressServer.use(serveStatic(__dirname.replace('build', 'client/build'), {
+    index: 'index.html',
+  }))
 
   Logging.info('Bootstrap', `Starting Express on port ${port}`)
   server.listen(port)
