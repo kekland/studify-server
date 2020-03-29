@@ -32,7 +32,7 @@ const bootstrap = async () => {
 
   if (isLocal) {
     expressServer.use((req, res, next) => {
-      setTimeout(() => next(), 1500);
+      setTimeout(() => next(), 500);
     })
   }
 
@@ -58,9 +58,9 @@ const bootstrap = async () => {
   Object.keys(routers).forEach(key => expressServer.use(key, routers[key]))
 
   // Setup client serving
-  expressServer.use(serveStatic(__dirname.replace('build', 'client/build'), {
-    index: 'index.html',
-  }))
+  const client = __dirname.replace('build', 'client/build')
+  expressServer.use(express.static(client))
+  expressServer.use('*', express.static(client))
 
   Logging.info('Bootstrap', `Starting Express on port ${port}`)
   server.listen(port)
