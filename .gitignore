@@ -1,6 +1,5 @@
 build/
 node_modules/
 src/config.ts
-src/config-local.ts
 ormconfig.json
 client/
