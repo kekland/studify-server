@@ -96,14 +96,15 @@ export class GroupMethods {
     await group.save()
 
     await MessagingSocket.onGroupChange(group)
-    
+
     return new GroupJoinResponse(group);
   }
 
-  static notifyAllGroupUsers = async (group: Group, notificationData: INotificationBody) => {
+  static notifyAllGroupUsers = async (group: Group, notificationData: INotificationBody, author?: string) => {
     const users = await GroupMethods._getGroupUsers(group.id, {})
 
     for (const user of users) {
+      if (user.id === author) continue
       await NotificationMethods.pushNotification({ userId: user.id, ...notificationData })
     }
   }

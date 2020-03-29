@@ -32,7 +32,7 @@ const bootstrap = async () => {
 
   if (isLocal) {
     expressServer.use((req, res, next) => {
-      setTimeout(() => next(), 550);
+      setTimeout(() => next(), 1500);
     })
   }
 

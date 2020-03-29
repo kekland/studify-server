@@ -44,7 +44,7 @@ export class NotificationMethods {
       .where('notification."userId" = :userId', { userId: user.id })
 
     if (unreadOnly) {
-      query = query.where('notification.read = :read', { read: false })
+      query = query.andWhere('notification.read = :read', { read: false })
     }
 
     if (from) {
@@ -76,8 +76,8 @@ export class NotificationMethods {
 
   static setGroupAsRead: AuthorizedMethod<NoRequestData, NoRequestResponse> = async (user, data, params) => {
     if (!params?.groupId) throw Errors.invalidRequest
-  
-    await Notification.createQueryBuilder('notification')
+
+    const changes = await Notification.createQueryBuilder('notification')
       .update()
       .set({ read: true })
       .where('notification.read = :read', { read: false })
