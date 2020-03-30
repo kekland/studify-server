@@ -12,6 +12,7 @@ import { MessagingMethods } from '../methods/messaging/messaging'
 const sendMessage = generateAuthorizedMethodEndpoint<SendMessageData, SendMessageResponse>(MessagingMethods.sendMessage, {
   validateBody: true,
   validateUser: true,
+  inputClass: SendMessageData,
 }, SendMessageResponse.transform)
 
 const uploadFiles = generateAuthorizedMethodEndpoint<NoRequestData, UploadFilesResponse>(MessagingMethods.uploadFiles, {
@@ -23,6 +24,7 @@ export const messagingRouter: () => Router = () => {
   const router = Router()
 
   router.post('/uploadFiles', uploadFiles)
+  router.post('/send', sendMessage)
 
   return router
 }

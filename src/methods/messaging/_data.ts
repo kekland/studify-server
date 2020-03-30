@@ -12,9 +12,9 @@ export class SendMessageData {
   @IsString()
   body!: string;
 
-  @IsArray()
-  @ValidateNested({ each: true })
-  attachments!: Attachment[];
+  @IsOptional()
+  @IsString()
+  replyTo?: string;
 
   @IsOptional()
   @IsString()
@@ -23,15 +23,17 @@ export class SendMessageData {
 
 export class SendMessageResponse {
   message: Message;
+  idempotencyId?: string;
 
-  constructor(message: Message) {
+  constructor(message: Message, idempotencyId?: string) {
     this.message = message
+    this.idempotencyId = idempotencyId
   }
 
-  static transform(data: SendMessageResponse, idempotencyId?: string) {
+  static transform(data: SendMessageResponse) {
     return {
       message: Message.transformSocket(data.message),
-      idempotencyId: idempotencyId,
+      idempotencyId: data.idempotencyId,
     }
   }
 }

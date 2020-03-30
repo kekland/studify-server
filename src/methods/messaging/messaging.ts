@@ -18,18 +18,29 @@ export class MessagingMethods {
     const message = new Message({
       body: data.body,
       attachments: [
-        ...(data.attachments.filter(a => a.type !== 'file')),
         ...(fileData.files.map(f => new Attachment('file', f.url, { name: f.name }))),
       ],
       user: user,
       group: group,
     })
 
+    if (data.replyTo) {
+      const replyMessage = await MessagingMethods._getMessage(data.replyTo)
+      if (replyMessage)
+        message.attachments.push({ type: 'reply', rel: data.replyTo, additional: Message.transformSocket(replyMessage) })
+    }
+
     await message.save()
 
     await GroupMethods.notifyAllGroupUsers(group, { groupId: group.id, message: message.body, type: 'onMessage', }, user.id)
 
-    return new SendMessageResponse(message)
+    return new SendMessageResponse(message, data.idempotencyId)
+  }
+
+  static _getMessage = async (id: string) => {
+    const message = await Message.findOne(id)
+
+    return message
   }
 
   static getMessages: AuthorizedMethod<PaginatedData, GetMessagesResponse> = async (user, data, params) => {

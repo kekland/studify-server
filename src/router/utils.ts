@@ -12,6 +12,7 @@ export const defaultTransformer = (data: any) => data
 export const generateEndpoint = <Req, Res>(task: (user: User | undefined, data: Req, params: ParamsType, files: any) => Promise<Res>, validation: IValidationSettings<Req>, transformer: Transformer<Res> = defaultTransformer) => {
   return async (req: Request, res: Response) => {
     try {
+      console.log(req.body)
       Logging.verbose(validation.inputClass?.name ?? 'Endpoint', `${req.ip} at endpoint`)
       const { user, data } = await validateRequest(req, validation)
 
