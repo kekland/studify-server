@@ -162,7 +162,7 @@ export class SearchGroupsResponse {
 
   static transform(data: SearchGroupsResponse) {
     return {
-      groups: data.groups.map((group) => Group.transformMinimal(group))
+      groups: data.groups.map((group) => Group.transform(group))
     }
   }
 }

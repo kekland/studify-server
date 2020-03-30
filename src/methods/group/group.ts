@@ -137,14 +137,21 @@ export class GroupMethods {
   }
 
   static searchGroups: UnauthorizedMethod<SearchGroupsData, SearchGroupsResponse> = async (data) => {
-    const response = await Group.find({
-      where: data.query ? [{ name: Like(`%${data.query}%`) }] : [],
-      skip: data.skip,
-      take: data.limit,
-      order: {
-        userCount: 'DESC',
-      }
-    })
+    let query = Group.createQueryBuilder('group')
+      .select()
+      .take(data.limit)
+      .skip(data.skip)
+
+    if (data.query)
+      query = query
+        .addSelect("ts_rank_cd(to_tsvector(coalesce(group.name, '')), plainto_tsquery(:query))", 'rank')
+        .setParameter('query', data.query)
+        .orderBy('rank', 'DESC')
+        .addOrderBy('group.userCount', 'DESC')
+    else
+      query = query.orderBy('group.userCount', "DESC")
+
+    const response = await query.getMany()
 
     return new SearchGroupsResponse(response)
   }
