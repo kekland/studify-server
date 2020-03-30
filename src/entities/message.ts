@@ -1,10 +1,28 @@
 import { User } from "./user";
 import { Group } from "./group";
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn, BaseEntity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne } from "typeorm";
+import { IsEnum, IsString, IsOptional } from "class-validator";
+
+export class Attachment {
+  @IsEnum(['file', 'reply'])
+  type!: 'file' | 'reply';
+
+  @IsString()
+  rel!: string;
+
+  @IsOptional()
+  additional: any;
+
+  constructor(type: 'file' | 'reply', rel: string, additional: any) {
+    this.type = type
+    this.rel = rel
+    this.additional = additional
+  }
+}
 
 export interface IMessage {
   body: string;
-  attachments?: string[];
+  attachments: Attachment[];
   user: User;
   group: Group;
 }
@@ -17,8 +35,8 @@ export class Message extends BaseEntity {
   @Column()
   body!: string;
 
-  @Column('varchar', { array: true, nullable: true })
-  attachments?: string[];
+  @Column('simple-json')
+  attachments!: Attachment[];
 
   @ManyToOne(type => User, { eager: true })
   @JoinColumn()

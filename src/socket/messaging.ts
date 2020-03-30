@@ -36,7 +36,8 @@ export class MessagingSocket {
       socketJoinRooms()
       server.to(socket.id).emit('authorization', { success: true })
 
-      generateSocketEventHandler<SendMessageData>('sendMessage', socket, async (data) => {
+      /* @deprecated Now messages are sent through HTTP */
+      /* generateSocketEventHandler<SendMessageData>('sendMessage', socket, async (data) => {
         const response = await MessagingMethods.sendMessage(user, data)
 
         socket.broadcast.to(data.groupId).emit('onNewGroupMessage', SendMessageResponse.transform(response))
@@ -44,7 +45,7 @@ export class MessagingSocket {
         if (data.idempotencyId) {
           server.to(socket.id).emit('onMessageSent', SendMessageResponse.transform(response, data.idempotencyId))
         }
-      }, { inputClass: SendMessageData, validateBody: true })
+      }, { inputClass: SendMessageData, validateBody: true }) */
 
       generateSocketEventHandler<UpdateTypingStatusData>('updateTypingStatus', socket, async (data) => {
         socket.broadcast.to(data.room).emit('onUserTypingStatusUpdated', { user: User.transformMinimal(user), status: data.status, groupId: data.room })

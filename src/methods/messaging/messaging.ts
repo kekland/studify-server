@@ -2,7 +2,7 @@ import { AuthorizedMethod, NoRequestData } from "../utils";
 import { SendMessageData, SendMessageResponse, PaginatedData, GetMessagesResponse, UploadFilesResponse } from "./_data";
 import { GroupMethods } from "../group/group";
 import { Errors } from "../../validation/errors";
-import { Message } from "../../entities/message";
+import { Message, Attachment } from "../../entities/message";
 import admin from 'firebase-admin'
 import { uuid } from 'uuidv4'
 
@@ -13,14 +13,17 @@ export class MessagingMethods {
     if (!group) throw Errors.invalidRequest
     if (!user.hasGroup(group)) throw Errors.insufficientPermissions
 
+    const fileData = await MessagingMethods.uploadFiles(user, {}, undefined, files)
+
     const message = new Message({
       body: data.body,
-      attachments: data.attachments,
+      attachments: [
+        ...(data.attachments.filter(a => a.type !== 'file')),
+        ...(fileData.files.map(f => new Attachment('file', f.url, { name: f.name }))),
+      ],
       user: user,
       group: group,
     })
-
-    console.log(files)
 
     await message.save()
 

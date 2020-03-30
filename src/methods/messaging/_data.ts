@@ -1,5 +1,5 @@
-import { IsNotEmpty, Max, IsNumber, IsArray, IsString, IsUrl, ValidateIf, IsOptional } from "class-validator";
-import { Message } from "../../entities/message";
+import { IsNotEmpty, Max, IsNumber, IsArray, IsString, IsUrl, ValidateIf, IsOptional, ValidateNested } from "class-validator";
+import { Message, Attachment } from "../../entities/message";
 import { Transform, TransformPlainToClass } from "class-transformer";
 import { TransformationType } from "class-transformer/TransformOperationExecutor";
 
@@ -12,10 +12,9 @@ export class SendMessageData {
   @IsString()
   body!: string;
 
-  @IsOptional()
   @IsArray()
-  @IsUrl({}, { each: true })
-  attachments?: string[];
+  @ValidateNested({ each: true })
+  attachments!: Attachment[];
 
   @IsOptional()
   @IsString()

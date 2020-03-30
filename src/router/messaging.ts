@@ -6,8 +6,13 @@ import { AuthMethods } from '../methods/auth/auth'
 import { NotificationMethods } from '../methods/notifications/notifications'
 import { SetNotificationsAsReadData } from '../methods/notifications/_data'
 import { NoRequestResponse, NoRequestData } from '../methods/utils'
-import { UploadFilesResponse } from '../methods/messaging/_data'
+import { UploadFilesResponse, SendMessageData, SendMessageResponse } from '../methods/messaging/_data'
 import { MessagingMethods } from '../methods/messaging/messaging'
+
+const sendMessage = generateAuthorizedMethodEndpoint<SendMessageData, SendMessageResponse>(MessagingMethods.sendMessage, {
+  validateBody: true,
+  validateUser: true,
+}, SendMessageResponse.transform)
 
 const uploadFiles = generateAuthorizedMethodEndpoint<NoRequestData, UploadFilesResponse>(MessagingMethods.uploadFiles, {
   validateBody: false,
