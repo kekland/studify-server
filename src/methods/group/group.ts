@@ -1,4 +1,4 @@
-import { GroupGetResponse, GroupGetData, GroupGetMultipleResponse, GroupGetAllData, GroupJoinData, GroupJoinResponse, GroupLeaveData, GroupLeaveResponse, GroupGetUsersResponse, GroupLoadDataResponse, GroupLoadAllDataResponse } from "./_data";
+import { GroupGetResponse, GroupGetData, GroupGetMultipleResponse, GroupGetAllData, GroupJoinData, GroupJoinResponse, GroupLeaveData, GroupLeaveResponse, GroupGetUsersResponse, GroupLoadDataResponse, GroupLoadAllDataResponse, SearchGroupsData, SearchGroupsResponse } from "./_data";
 import { UnauthorizedMethod, AuthorizedMethod, NoRequestData } from "../utils";
 import { Group } from "../../entities/group";
 import { Errors } from "../../validation/errors";
@@ -8,6 +8,7 @@ import { MessagingMethods } from "../messaging/messaging";
 import { NotificationMethods } from "../notifications/notifications";
 import { INotification, INotificationBody } from "../../entities/notification";
 import { MessagingSocket } from "../../socket/messaging";
+import { Like } from "typeorm";
 
 export class GroupMethods {
   static async getGroupById(id: string): Promise<Group | undefined> {
@@ -133,5 +134,18 @@ export class GroupMethods {
     const response = await Promise.all(user.groups.map((group) => GroupMethods._loadData(user, group)))
 
     return new GroupLoadAllDataResponse(response)
+  }
+
+  static searchGroups: UnauthorizedMethod<SearchGroupsData, SearchGroupsResponse> = async (data) => {
+    const response = await Group.find({
+      where: data.query ? [{ name: Like(`%${data.query}%`) }] : [],
+      skip: data.skip,
+      take: data.limit,
+      order: {
+        userCount: 'DESC',
+      }
+    })
+
+    return new SearchGroupsResponse(response)
   }
 }

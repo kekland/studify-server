@@ -1,7 +1,8 @@
-import { MinLength, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { MinLength, IsNotEmpty, IsNumber, IsString, ValidateIf } from "class-validator";
 import { Group, IGroup } from "../../entities/group";
 import { Message } from "../../entities/message";
 import { User } from "../../entities/user";
+import { PaginatedData } from "../messaging/_data";
 
 export class GroupCreateData {
   @MinLength(6)
@@ -142,6 +143,26 @@ export class GroupLoadAllDataResponse {
   static transform(data: GroupLoadAllDataResponse) {
     return {
       data: data.data.map(response => GroupLoadDataResponse.transform(response))
+    }
+  }
+}
+
+export class SearchGroupsData extends PaginatedData {
+  @ValidateIf((_, v) => v != null)
+  @IsString()
+  query?: string;
+}
+
+export class SearchGroupsResponse {
+  groups: Group[];
+
+  constructor(groups: Group[]) {
+    this.groups = groups
+  }
+
+  static transform(data: SearchGroupsResponse) {
+    return {
+      groups: data.groups.map((group) => Group.transformMinimal(group))
     }
   }
 }

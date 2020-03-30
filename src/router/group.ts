@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express'
 import { generateEndpoint, generateUnauthorizedMethodEndpoint, generateAuthorizedMethodEndpoint } from './utils'
 import { Group } from '../entities/group'
-import { GroupUpdateData, GroupCreateData, GroupGetData, GroupGetResponse, GroupGetMultipleResponse, GroupGetAllData, GroupJoinData, GroupJoinResponse, GroupLeaveResponse, GroupLeaveData, GroupGetUsersResponse, GroupLoadDataResponse, GroupLoadAllDataResponse } from '../methods/group/_data'
+import { GroupUpdateData, GroupCreateData, GroupGetData, GroupGetResponse, GroupGetMultipleResponse, GroupGetAllData, GroupJoinData, GroupJoinResponse, GroupLeaveResponse, GroupLeaveData, GroupGetUsersResponse, GroupLoadDataResponse, GroupLoadAllDataResponse, SearchGroupsData } from '../methods/group/_data'
 import { GroupMethods } from '../methods/group/group'
 import { GroupAdminMethods } from '../methods/group/group_admin'
 import { PaginatedData, GetMessagesResponse } from '../methods/messaging/_data'
@@ -66,10 +66,17 @@ const setGroupAsRead = generateAuthorizedMethodEndpoint(NotificationMethods.setG
   validateBody: true,
 })
 
+const searchGroups = generateUnauthorizedMethodEndpoint(GroupMethods.searchGroups, {
+  inputClass: SearchGroupsData,
+  validateBody: true,
+  validateUser: false,
+})
+
 export const groupRouter: () => Router = () => {
   const router = Router()
 
   router.get('/all', getAllGroups)
+  router.get('/search', searchGroups)
   router.get('/loadAllData', loadAllData)
   router.get('/:groupId/loadData', loadData)
   router.get('/:groupId/users', getUsers)
