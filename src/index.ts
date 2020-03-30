@@ -12,6 +12,7 @@ import { Logging } from "./logging/logging";
 import cors from 'cors'
 import http from 'http'
 import { notificationsRouter } from "./router/notifications";
+import { usersRouter } from "./router/user";
 
 let isLocal = process.env.PORT == null
 let config = Local.configuration
@@ -53,6 +54,7 @@ const bootstrap = async () => {
     '/api/auth': authRouter(),
     '/api/group': groupRouter(),
     '/api/notifications': notificationsRouter(),
+    '/api/user': usersRouter(),
   }
 
   Object.keys(routers).forEach(key => expressServer.use(key, routers[key]))
