@@ -3,3 +3,4 @@ node_modules/
 src/config.ts
 ormconfig.json
 client/
+firebase-admin.json
