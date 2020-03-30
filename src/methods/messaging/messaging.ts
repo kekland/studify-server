@@ -5,6 +5,7 @@ import { Errors } from "../../validation/errors";
 import { Message, Attachment } from "../../entities/message";
 import admin from 'firebase-admin'
 import { uuid } from 'uuidv4'
+import { MessagingSocket } from "../../socket/messaging";
 
 export class MessagingMethods {
   static sendMessage: AuthorizedMethod<SendMessageData, SendMessageResponse> = async (user, data, _, files) => {
@@ -33,6 +34,7 @@ export class MessagingMethods {
     await message.save()
 
     await GroupMethods.notifyAllGroupUsers(group, { groupId: group.id, message: message.body, type: 'onMessage', }, user.id)
+    await MessagingSocket.onNewGroupMessage(user.id, group.id, message)
 
     return new SendMessageResponse(message, data.idempotencyId)
   }

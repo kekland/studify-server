@@ -8,6 +8,7 @@ import { Errors } from '../validation/errors'
 import { UserMethods } from '../methods/user/user'
 import { User } from '../entities/user'
 import { Logging } from '../logging/logging'
+import { Message } from '../entities/message'
 
 export class MessagingSocket {
   static server: Server;
@@ -61,6 +62,10 @@ export class MessagingSocket {
         }
       })
     })
+  }
+
+  static async onNewGroupMessage(userId: string, groupId: string, message: Message) {
+    this.server.to(groupId).emit('onNewGroupMessage', SendMessageResponse.transform(new SendMessageResponse(message)))
   }
 
   static async onGroupChange(group: Group) {
