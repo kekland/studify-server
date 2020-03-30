@@ -9,7 +9,7 @@ export class UserDataResponse {
 
   static transform(data: UserDataResponse) {
     return {
-      data: User.transformMinimal(data.data)
+      data: User.transformOwner(data.data)
     }
   }
 }
