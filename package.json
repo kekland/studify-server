@@ -10,7 +10,8 @@
     "build": "npm run load-client && npm run build-client && npm run build-server",
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "node build/index.js",
-    "start": "npm run serve"
+    "start": "npm run serve",
+    "debug-serve": "npm run build-server && npm run serve"
   },
   "repository": {
     "type": "git",
@@ -38,7 +39,8 @@
     "pg": "^7.18.2",
     "reflect-metadata": "^0.1.13",
     "socket.io": "^2.3.0",
-    "typeorm": "^0.3.0-rc.19"
+    "typeorm": "^0.3.0-rc.19",
+    "uuidv4": "^6.0.6"
   },
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",

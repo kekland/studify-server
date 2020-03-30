@@ -9,14 +9,14 @@ import { Logging } from "../logging/logging";
 export type Transformer<Res> = (data: NonNullable<Res>) => any
 export const defaultTransformer = (data: any) => data
 
-export const generateEndpoint = <Req, Res>(task: (user: User | undefined, data: Req, params: ParamsType) => Promise<Res>, validation: IValidationSettings<Req>, transformer: Transformer<Res> = defaultTransformer) => {
+export const generateEndpoint = <Req, Res>(task: (user: User | undefined, data: Req, params: ParamsType, files: any) => Promise<Res>, validation: IValidationSettings<Req>, transformer: Transformer<Res> = defaultTransformer) => {
   return async (req: Request, res: Response) => {
     try {
       Logging.verbose(validation.inputClass?.name ?? 'Endpoint', `${req.ip} at endpoint`)
       const { user, data } = await validateRequest(req, validation)
 
       Logging.verbose(validation.inputClass?.name ?? 'Endpoint', `${req.ip} is {${user?.id}, ${user?.username}}`)
-      const responseBody = await task(user, data, req.params)
+      const responseBody = await task(user, data, req.params, req.files)
       if (responseBody) {
         res.send(classToPlain(transformer(responseBody as NonNullable<Res>)))
       }
@@ -34,9 +34,9 @@ export const generateEndpoint = <Req, Res>(task: (user: User | undefined, data: 
 }
 
 export const generateAuthorizedMethodEndpoint = <Req, Res>(method: AuthorizedMethod<Req, Res>, validation: IValidationSettings<Req>, transformer: Transformer<Res> = defaultTransformer) => {
-  return generateEndpoint(async (user, data, params) => {
+  return generateEndpoint(async (user, data, params, files) => {
     if (!user) throw Errors.invalidAuthentication
-    const res = await method(user, data, params)
+    const res = await method(user, data, params, files)
     return res
   }, validation, transformer)
 }

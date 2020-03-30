@@ -1,11 +1,13 @@
-import { AuthorizedMethod } from "../utils";
-import { SendMessageData, SendMessageResponse, PaginatedData, GetMessagesResponse } from "./_data";
+import { AuthorizedMethod, NoRequestData } from "../utils";
+import { SendMessageData, SendMessageResponse, PaginatedData, GetMessagesResponse, UploadFilesResponse } from "./_data";
 import { GroupMethods } from "../group/group";
 import { Errors } from "../../validation/errors";
 import { Message } from "../../entities/message";
+import admin from 'firebase-admin'
+import { uuid } from 'uuidv4'
 
 export class MessagingMethods {
-  static sendMessage: AuthorizedMethod<SendMessageData, SendMessageResponse> = async (user, data) => {
+  static sendMessage: AuthorizedMethod<SendMessageData, SendMessageResponse> = async (user, data, _, files) => {
     const group = await GroupMethods.getGroupById(data.groupId)
 
     if (!group) throw Errors.invalidRequest
@@ -17,6 +19,8 @@ export class MessagingMethods {
       user: user,
       group: group,
     })
+
+    console.log(files)
 
     await message.save()
 
@@ -43,5 +47,29 @@ export class MessagingMethods {
 
     messages.forEach(message => message.groupId = group.id)
     return new GetMessagesResponse(messages)
+  }
+
+  static uploadFiles: AuthorizedMethod<NoRequestData, UploadFilesResponse> = async (user, _, __, files) => {
+    const response = []
+
+    console.log(files)
+    for (const fileKey in files) {
+      const fileId = uuid()
+
+      const file = files[fileKey]
+      const parts = file.name.split('.')
+      const extension = parts[parts.length - 1]
+
+      await admin.storage().bucket().file(`${fileId}.${extension}`).save(file.data)
+      const url = (await admin.storage().bucket().file(`${fileId}.${extension}`).getSignedUrl({
+        action: 'read',
+        expires: '03-09-2491',
+        version: 'v2',
+      })) as any
+
+      response.push({ url, name: file.name })
+    }
+
+    return new UploadFilesResponse(response)
   }
 }

@@ -66,7 +66,20 @@ export class GetMessagesResponse {
 export class UpdateTypingStatusData {
   @IsNotEmpty()
   room!: string;
-  
+
   @IsNotEmpty()
   status!: boolean;
+}
+
+export interface IFileUploaded {
+  name: string;
+  url: string;
+}
+
+export class UploadFilesResponse {
+  files: IFileUploaded[];
+
+  constructor(files: IFileUploaded[]) {
+    this.files = files
+  }
 }

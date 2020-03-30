@@ -15,6 +15,7 @@ import { notificationsRouter } from "./router/notifications";
 import { usersRouter } from "./router/user";
 import fileUpload from 'express-fileupload'
 import admin from 'firebase-admin'
+import { messagingRouter } from "./router/messaging";
 
 let isLocal = process.env.PORT == null
 let config = Local.configuration
@@ -45,7 +46,8 @@ const bootstrap = async () => {
 
   // Load firebase
   admin.initializeApp({
-    credential: admin.credential.cert(firebaseAdminCredentials)
+    credential: admin.credential.cert(firebaseAdminCredentials),
+    storageBucket: 'studify-app.appspot.com'
   })
 
   // Load server
@@ -80,6 +82,7 @@ const bootstrap = async () => {
     '/api/group': groupRouter(),
     '/api/notifications': notificationsRouter(),
     '/api/user': usersRouter(),
+    '/api/messaging': messagingRouter(),
   }
 
   Object.keys(routers).forEach(key => expressServer.use(key, routers[key]))

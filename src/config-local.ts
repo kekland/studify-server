@@ -9,7 +9,7 @@ export const configuration = {
     type: 'postgres',
     port: 5432,
     username: 'postgres',
-    password: 'postgres',
+    password: 'Kekland1488322',
     database: 'studify',
     entities: [Group, Message, User, Notification],
     synchronize: true,
